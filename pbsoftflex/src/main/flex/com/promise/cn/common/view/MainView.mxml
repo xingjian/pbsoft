@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.common.view.*">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.ac.mxeffects.CubeRotate;
+			import com.adobe.ac.mxeffects.DistortionConstants;
+			import com.adobe.ac.mxeffects.Flip;
+			import com.adobe.ac.mxeffects.Gate;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.controls.Alert;
+			
+			//初始化方法
+			private function init():void{
+				AppEvent.addListener(PBConstant.APP_LOGINSUCCESS,loginSuccessEventHandler);
+			}
+			
+			//登录成功
+			protected function loginSuccessEventHandler(event:AppEvent):void{
+				var e : Gate = new Gate(mainLoginViewNC);
+				e.siblings = [mainLoginSuccessViewNC];
+				e.direction = DistortionConstants.LEFT;
+				e.verticalLightingLocation = DistortionConstants.RIGHT;
+				e.duration = 2000;
+				e.play();
+			}
+			
+			//登录失败
+			protected function loginFailureEventHandler(event:AppEvent):void{
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<mx:ViewStack id="loginViewStack" width="100%" height="100%" creationPolicy="all">
+			<s:NavigatorContent id="mainLoginViewNC" width="100%" height="100%">
+				<view:MainView_LoginView id="mainLoginView" />
+			</s:NavigatorContent>
+			<s:NavigatorContent id="mainLoginSuccessViewNC" width="100%" height="100%">
+				<view:MainView_LoginSuccessView id="mainLoginSuccessView" />
+			</s:NavigatorContent>
+		</mx:ViewStack>
+	</s:VGroup>
+</s:Group>

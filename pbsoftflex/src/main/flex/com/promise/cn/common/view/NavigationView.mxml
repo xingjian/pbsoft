@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name="navigationListChange",type ="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable]
+			private var listNormalArray:ArrayList;
+			
+			//初始化方法
+			public function init():void{
+				listNormalArray = Global.checkPowerArray([
+					{label:"用户管理",uri:"userManager",icon:Icons.userManager},
+					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager}]);
+			}
+			
+			//titleClick
+			public function tileClick(event:IndexChangeEvent):void{
+				dispatchEvent(new AppEvent(PBConstant.APP_NAVIGATION_LISTCHANGE,event.currentTarget.selectedItem.uri));
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:Accordion width="100%" height="100%">
+		<s:NavigatorContent id="nc1" label="系统管理" width="100%">
+			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
+				<s:List id="listNormal" height="100%" width="100%" borderVisible="false" dataProvider="{listNormalArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
+			</s:VGroup>
+		</s:NavigatorContent>
+	</mx:Accordion>
+</s:Group>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import spark.components.Label;
+			
+			[Bindable]
+			public var pbUser:PBUser;
+			
+			//初始化方法
+			public function init():void{
+				AppEvent.addListener(PBConstant.APP_LOGINSUCCESS,loginSuccessHandler);
+			}
+			
+			//登陆成功方法
+			public function loginSuccessHandler(event:AppEvent):void{
+				pbUser = Global.pbUser;
+				var userInfoLabel:Label = new Label();
+				userInfoLabel.text = '欢迎 '+pbUser.name+' 登录PBSoft!';
+				userInfoHG.addElement(userInfoLabel);
+			}
+		]]>
+	</fx:Script>
+	<s:Rect width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:SolidColor color="#666666"/>
+		</s:fill>
+	</s:Rect>
+	<s:HGroup height="100%" width="100%">
+		<s:Image height="100%" id="logoImage" source="@Embed('../../images/logo.png')" />
+		<s:HGroup horizontalAlign="right" height="100%" verticalAlign="bottom" id="userInfoHG" width="100%">
+		</s:HGroup>
+	</s:HGroup>
+</s:Group>

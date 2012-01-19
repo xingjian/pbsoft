@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+					  xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="init()" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="250">
+	<fx:Declarations>
+		<fx:Array id="validators">
+			<mx:StringValidator id="userNameValidator" trigger="{regBtn}" source="{userName}" property="text" required="true" requiredFieldError="用户名不能为空！" />
+			<mx:StringValidator id="emailValidator" trigger="{regBtn}" source="{email}" property="text" required="true" requiredFieldError="邮箱不能为空！" />
+			<mx:StringValidator id="firstpwdValidator" trigger="{regBtn}" source="{firstpwd}" property="text" required="true" requiredFieldError="密码不能为空！" />
+		</fx:Array>
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name ="backLoginEvent",type ="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.controls.Alert;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			import mx.validators.Validator;
+			
+			private var pbUserService:RemoteObject;
+			private var pbUserService_CheckUser:RemoteObject;
+			[Bindable]
+			private var errorTip:String;
+			[Bindable]
+			private var checkUserMess:String;
+			
+			//登录按钮click
+			protected function backBtn_clickHandler(event:MouseEvent):void{
+				dispatchEvent(new AppEvent("backLoginEvent","back login"));
+			}
+			
+			//注册按钮事件
+			protected function regBtn_clickHandler(event:MouseEvent):void{
+				var validatorErrorArray:Array = Validator.validateAll(validators);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if(isValidForm){
+					if(firstpwd.text==secondpwd.text){
+						var pbUser:PBUser = new PBUser();
+						pbUser.name = userName.text;
+						pbUser.password = firstpwd.text;
+						pbUser.email = email.text;
+						errorTip="";
+						checkUserMess="";
+						pbUserService.savePBUser(pbUser);
+					}else{
+						errorTip = "两次输入的密码不一致,请重新输入！";
+					}
+				}
+			}
+			
+			//重置按钮
+			public function resetBtn_clickHandler():void{
+				userName.text="";
+				firstpwd.text="";
+				secondpwd.text="";
+				errorTip="";
+				email.text="";
+				checkUserMess="";
+			}
+			
+			//初始化方法
+			public function init():void{
+				pbUserService = Global.getRemoteObject("pbUserService",pbUserServiceHandler);
+				pbUserService_CheckUser = Global.getRemoteObject("pbUserService",pbUserService_CheckUserHandler);
+			}
+			
+			//检查用户结果
+			public function pbUserService_CheckUserHandler(event:ResultEvent):void{
+				var checkResult:Boolean = event.result as Boolean;
+				if(checkResult){
+					checkUserMess="恭喜您,用户名可以使用！";
+					checkUserLabel.setStyle("color","#00FF00");
+				}else{
+					checkUserMess="用户名被占用,请重新输入！";
+					checkUserLabel.setStyle("color","#FF0000");
+				}
+			}
+			
+			//检查用户名
+			public function linkBtnClick(event:MouseEvent):void{
+				var userNameStr:String = userName.text.toString();
+				if(null==userNameStr||userNameStr==""){
+					checkUserMess="用户名不能为空！";
+					checkUserLabel.setStyle("color","#FF0000");
+				}else{
+					pbUserService_CheckUser.checkUserNameIsUse(userName.text);
+				}
+			}
+			
+			//注册用户状态返回
+			public function pbUserServiceHandler(event:ResultEvent):void{
+				var regStr:String = event.result as String;
+				if(regStr=="1"){
+					Alert.show("注册用户成功,点击返回登录按钮进行登录！","PBSoft消息提示");
+					resetBtn_clickHandler();
+				}else{
+					checkUserMess="用户名被占用,请重新输入！";
+					checkUserLabel.setStyle("color","#FF0000");
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:Panel width="100%" height="100%" title="欢迎注册PBSoft用户" dropShadowVisible="false">
+			<s:Label x="61" y="17" width="65" text="用户名称："/>
+			<s:TextInput id="userName" x="128" y="11" width="208" height="27" text=""/>
+			<s:Label x="61" y="72" width="65" text="输入密码："/>
+			<s:Label x="61" y="107" text="确认密码："/>
+			<s:Label x="61" y="140" text="邮箱地址："/>
+			<s:TextInput id="firstpwd" displayAsPassword="true" x="128" y="65" width="208" height="27" text=""/>
+			<s:TextInput id="secondpwd" displayAsPassword="true" x="128" y="98" width="208" height="27" text=""/>
+			<s:TextInput id="email" x="128" y="132" width="208" height="27" text=""/>
+			<s:Button id="loginBtn" x="267" y="174" label="返回登录" click="backBtn_clickHandler(event)"/>
+			<s:Button x="61" y="174" id="regBtn" label="提交注册" click="regBtn_clickHandler(event)"/>
+			<s:Button x="164" y="174" label="重置" click="resetBtn_clickHandler()"/>
+			<mx:LinkButton x="128" y="42" label="检查用户名" click="linkBtnClick(event)" color="#EFB01A" fontWeight="bold"/>
+			<s:Label x="61" y="198" width="276" height="18" color="#EB0E0E" text="{errorTip}" textAlign="center" verticalAlign="middle"/>
+			<s:Label id="checkUserLabel" x="220" textAlign="center" verticalAlign="middle" y="47" width="155" text="{checkUserMess}"/>
+		</s:Panel>
+	</s:VGroup>
+</s:SkinnableContainer>

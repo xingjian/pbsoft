@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" close="closeBtnClick()" title="{'设置'+pbUser.name+'权限'}" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="400" xmlns:view="com.promise.cn.framework.view.*">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name="distributePowerSuccess",type="com.promise.cn.framework.event.AppEvent")] 
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.Menu;
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var treeDataSource:ArrayCollection;
+			private var menuServiceList:RemoteObject;
+			public var userService:RemoteObject;
+			[Bindable]
+			public var pbUser:PBUser;
+			public var pbMenus:ArrayCollection = new ArrayCollection();
+			
+			//初始化方法
+			public function init():void{
+				menuServiceList = Global.getRemoteObject("menuService",menuServiceListHandle);
+				userService = Global.getRemoteObject("pbUserService",pbUserServiceHandle);
+				menuServiceList.getMenusTreeList();
+			}
+			
+			//菜单集合获取成功
+			public function menuServiceListHandle(event:ResultEvent):void{
+				var listTemp:ArrayCollection = event.result as ArrayCollection;
+				for(var m:int=0;m<listTemp.length;m++){
+					checkMenuState(listTemp.getItemAt(m) as Menu)
+				}
+				treeDataSource = listTemp;
+			}
+			
+			//检验菜单状态
+			public function checkMenuState(menu:Menu):void{
+				menu.state = checkPower(menu.url);
+				if(menu.parent!=null){
+					if(menu.state&&!menu.parent.state){
+						menu.parent.state = true;
+					}
+				}
+				if(menu.children!=null&&menu.children.length>0){
+					for(var j:int=0;j<menu.children.length;j++){
+						var menuTemp2:Menu = menu.children.getItemAt(j) as Menu;
+						checkMenuState(menuTemp2);
+					}
+				}
+			}
+			
+			//更新权限成功
+			public function pbUserServiceHandle(event:ResultEvent):void{
+				var str:String = event.result as String;
+				if(str=="1"){
+					Alert.show("保存成功！");
+					dispatchEvent(new AppEvent(PBConstant.APP_DISTRIBUTEPOWERSUCCESS,"success"))
+				}
+			}
+			
+			//确定按钮
+			public function okBtnClick(event:Event=null):void{
+				pbMenus.removeAll();
+				for(var i:int=0;i<treeDataSource.length;i++){
+					var menuTemp:Menu = treeDataSource.getItemAt(i) as Menu;
+					getMeus(menuTemp);
+				}
+				userService.updateUserMenu(pbUser,pbMenus);
+			}
+			
+			//获取菜单集合
+			public function getMeus(menu:Menu):void{
+				if(menu.state){
+					pbMenus.addItem(menu);
+					if(menu.children!=null&&menu.children.length>0){
+						for(var j:int=0;j<menu.children.length;j++){
+							var menuTemp2:Menu = menu.children.getItemAt(j) as Menu;
+							getMeus(menuTemp2);
+						}
+					}
+				}
+			}
+			
+			//监测权限通过url
+			public function checkPower(url:String):Boolean{
+				var menus:ArrayCollection = pbUser.menus;
+				var retBoo:Boolean = false;
+				if(null!=menus){
+					for(var i:int=0;i<menus.length;i++){
+						var menu:Menu = menus.getItemAt(i) as Menu;
+						if(url==menu.url){
+							retBoo = true;
+							break;
+						}
+					}
+				}
+				return retBoo;
+			}
+			
+			//关闭窗口
+			public function closeBtnClick(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" bottom="5">
+		<view:CheckTree id="powerTree" checkBoxStateField="state" labelField="name" dataProvider="{treeDataSource}" width="100%" height="100%" />
+		<s:HGroup width="100%" horizontalAlign="center">
+			<s:Button label="确 定" click="okBtnClick(event)" />
+			<s:Button label="关 闭" click="closeBtnClick(event)" />
+		</s:HGroup>
+	</s:VGroup>
+</s:TitleWindow>

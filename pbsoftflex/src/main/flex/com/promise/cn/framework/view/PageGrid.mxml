@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name="pageRefresh",type="com.promise.cn.framework.event.AppEvent")]
+		[Event(name="pageSelectChange",type="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			
+			[Bindable]
+			public var header:Array;
+			[Bindable]
+			public var _pageSize:int = 20;
+			[Bindable]
+			public var showPageParams:Boolean=true;//是否显示分页参数
+			[Bindable]
+			public var _pageNo:int = 1;
+			[Bindable]
+			public var _recTotal:int = 0;
+			[Bindable]
+			public var _pageTotal:int = 1;
+			[Bindable]
+			public var list:ArrayCollection;
+			[Bindable]
+			public var selectedItem:Object;
+			[Binable]
+			private var columns:Array;
+			//初始化方法
+			public function init():void{
+				setHeader();
+			}
+			
+			//设置表格集合
+			public function setList(value:Object):void{
+				this.list = value.result.list;
+				this._pageNo = value.result.pageNo;
+				this._pageTotal = (value.result.recTotal-1)/value.result.pageSize + 1;
+				this._pageSize = value.result.pageSize;
+				this._recTotal = value.result.recTotal;
+				this.dataGrid.dataProvider = this.list;
+			}
+			
+			//设置表格表头
+			public function setHeader():void{
+				this.columns = new Array();
+				for each(var obj:* in header){ 
+					var col:DataGridColumn = new DataGridColumn();
+					col.headerText = obj.headerText;
+					col.dataField = obj.dataField;
+					if(obj.width != undefined){
+						col.width = obj.width;
+					}
+					this.columns.push(col);
+				}
+				this.dataGrid.columns = this.columns;
+			}
+			
+			public function set pageSize(value:int):void{
+				_pageSize = value;
+			}
+			
+			public function get pageSize():int{
+				return _pageSize;
+			}
+			
+			public function get pageNo():int{
+				return _pageNo;
+			}
+			
+			public function get recTotal():int{
+				return _recTotal;
+			}
+			
+			public function get pageTotal():int{
+				return _pageTotal;
+			}
+			
+			//响应鼠标点击某一个数据行事件
+			public function selectChange(event:Event):void{
+				this.selectedItem = this.dataGrid.selectedItem;
+				dispatchEvent(new AppEvent(PBConstant.APP_PAGEGRID_SELECTCHANGE));
+			}
+			//响应刷新事件，分发刷新事件
+			public function refresh():void{
+				this.dataGrid.dataProvider = null;
+				this.list = null;
+				dispatchEvent(new AppEvent(PBConstant.APP_PAGEGRID_REFRESH));
+			}
+		]]>
+	</fx:Script>
+	<mx:DataGrid width="100%" height="100%" id="dataGrid" horizontalScrollPolicy="auto" change="selectChange(event)" top="0" left="0" bottom="0" right="0" >
+	</mx:DataGrid>
+	<s:HGroup width="100%" right="0" bottom="1" verticalAlign="middle" visible="{showPageParams}">
+		<mx:LinkButton label="刷 新" id="btnRefresh" click="refresh();"/>
+		<s:Label text=" 第{_pageNo}页 共{_pageTotal}页" visible="{_pageNo >= 1}"/>
+		<s:Label text="共{this._recTotal}条记录" textAlign="right" />
+		<s:HGroup width="100%" verticalAlign="middle" visible="{_pageTotal > 1}">
+			<s:Label text="第"/>
+			<s:NumericStepper id="nsPageNum" value="{_pageNo}" maximum="{_pageTotal}" minimum="1"/>
+			<s:Label text="页"/>
+			<mx:LinkButton label="转 到" click="{_pageNo = nsPageNum.value;refresh()}"/>
+			<mx:LinkButton label="首 页" enabled="{_pageNo > 1}"         click="{_pageNo=1;refresh();}"/>
+			<mx:LinkButton label="上一页" enabled="{_pageNo > 1}"         click="{_pageNo--;refresh();}"/>
+			<mx:LinkButton label="下一页" enabled="{_pageTotal > _pageNo}" click="{_pageNo++;refresh();}"/>
+			<mx:LinkButton label="末 页" enabled="{_pageTotal > _pageNo}" click="{_pageNo=_pageTotal;refresh();}"/>
+		</s:HGroup>
+	</s:HGroup>
+</s:VGroup>

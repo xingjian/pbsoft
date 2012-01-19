@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.Menu;
+			import com.promise.cn.framework.util.Global;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			private var menuList:ArrayCollection;
+			private var menuServiceList:RemoteObject;
+			private var menuServiceDelete:RemoteObject;
+			
+			//初始化方法
+			public function init():void{
+				menuServiceList = Global.getRemoteObject("menuService",menuServiceListHandle);
+				menuServiceDelete = Global.getRemoteObject("menuService",menuServiceDeleteHandle);
+				menuServiceList.getMenusTreeList();
+				initTreeContextMenu();
+			}
+			
+			//初始化树的右键菜单
+			public function initTreeContextMenu():void{
+				var contextMenu:ContextMenu = new ContextMenu();
+				contextMenu.hideBuiltInItems();
+				var contextMenuItems:Array = [];
+				var addMenuItem:ContextMenuItem = new ContextMenuItem("新增下级节点信息");
+				addMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,addMenu);
+				var removeMenuItem:ContextMenuItem = new ContextMenuItem("删除节点信息");
+				removeMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,removeMenu);
+				contextMenuItems.push(addMenuItem);
+				contextMenuItems.push(removeMenuItem);
+				contextMenu.customItems = contextMenuItems;
+				this.menuTree.contextMenu = contextMenu;
+			}
+			
+			//新增加菜单
+			public function addMenu(event:ContextMenuEvent):void{
+				rightGroup.removeAllElements();
+				var addMenu:AddMenu = new AddMenu();
+				addMenu.parentMenu = menuTree.selectedItem as Menu;
+				rightGroup.addElement(addMenu);
+			}
+			
+			//删除节点信息
+			public function removeMenu(event:ContextMenuEvent):void{
+				var menuTemp:Menu = menuTree.selectedItem as Menu;
+				menuServiceDelete.deleteMenu(menuTemp.id);
+			}
+			
+			//删除菜单成功处理
+			public function menuServiceDeleteHandle(event:ResultEvent):void{
+				menuServiceList.getMenusTreeList();
+				Alert.show("删除菜单成功！");
+			}
+			
+			//获取菜单树成功
+			public function menuServiceListHandle(event:ResultEvent):void{
+				menuList = event.result as ArrayCollection;
+				var root:Menu = menuList.getItemAt(0) as Menu;
+			}
+		]]>
+	</fx:Script>
+	<s:HGroup width="100%" height="100%">
+		<mx:Tree id="menuTree" width="25%" height="100%" dataProvider="{menuList}" labelField="name" />
+		<s:Group id="rightGroup" width="75%" height="100%">
+		</s:Group>
+	</s:HGroup>
+</s:Group>

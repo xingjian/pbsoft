@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.common.view.*">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.ac.mxeffects.CubeRotate;
+			import com.adobe.ac.mxeffects.DistortionConstants;
+			import com.adobe.ac.mxeffects.Flip;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.controls.Alert;
+			
+			public function init():void{
+				AppEvent.addListener(PBConstant.APP_STARTREGISTER,startRegisterHandler);
+			}
+			
+			//打开注册页面
+			public function startRegisterHandler(event:AppEvent):void{
+				var e : CubeRotate = new CubeRotate(loginViewNC);
+				e.siblings = [registerViewNC];
+				e.direction = DistortionConstants.LEFT;
+				e.horizontalLightingLocation = DistortionConstants.LEFT;
+				e.duration = 2000;
+				e.play();
+			}
+			
+			//返回登录页面
+			public function backLoginHandle(event:AppEvent):void{
+				var e : CubeRotate = new CubeRotate(registerViewNC);
+				e.siblings = [loginViewNC];
+				e.direction = DistortionConstants.RIGHT;
+				e.horizontalLightingLocation = DistortionConstants.LEFT;
+				e.duration = 2000;
+				e.play();
+			}
+			
+			//登录成功
+			protected function loginSuccessEventHandler(event:AppEvent):void{
+				AppEvent.dispatch(PBConstant.APP_LOGINSUCCESS,event.data);
+			}
+			
+			protected function loginFailureEventHandler(event:AppEvent):void{
+			}
+		]]>
+	</fx:Script>
+	<s:Rect width="100%" height="100%" alpha="1.0">
+		<s:fill>
+			<s:SolidColor color="#666666"/>
+		</s:fill>
+	</s:Rect>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<mx:ViewStack id="loginViewStack" creationPolicy="all">
+			<s:NavigatorContent id="loginViewNC" width="400" height="250">
+				<view:LoginView id="loginView"  loginSuccess="loginSuccessEventHandler(event)" loginFailure="loginFailureEventHandler(event)" />
+			</s:NavigatorContent>
+			<s:NavigatorContent id="registerViewNC" width="400" height="250">
+				<view:RegisterPBUserView id="registerView" backLoginEvent="backLoginHandle(event)"/>
+			</s:NavigatorContent>
+		</mx:ViewStack>
+	</s:VGroup>
+</s:Group>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" horizontalAlign="left" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.Menu;
+			import com.promise.cn.framework.util.Global;
+			
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			private var menuServiceAdd:RemoteObject;
+			
+			public var parentMenu:Menu;
+			
+			//初始化方法
+			public function init():void{
+				menuServiceAdd = Global.getRemoteObject("menuService",menuServiceAddHandle);
+			}
+			
+			//增加菜单处理
+			public function menuServiceAddHandle(event:ResultEvent):void{
+			
+			}
+			
+			//保存菜单
+			public function saveBtnClick(event:MouseEvent):void{
+				var menuTemp:Menu = new Menu();
+				menuTemp.name = menuName.text;
+				menuTemp.url = url.text;
+				menuTemp.remark = remark.text;
+				menuTemp.leaf = "1";
+				menuServiceAdd.saveMenu(parentMenu,menuTemp);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label text=""  />
+	<s:Form width="100%" id="loginForm">
+		<s:FormItem label="名称:">
+			<s:TextInput id="menuName" />
+		</s:FormItem>
+		<s:FormItem label="URL:">
+			<s:TextInput id="url" />
+		</s:FormItem>
+		<s:FormItem label="备注:">
+			<s:TextInput id="remark" />
+		</s:FormItem>
+		<s:FormItem label="URL:">
+			<s:Button label="保存" click="saveBtnClick(event)" />
+		</s:FormItem>
+	</s:Form>
+</s:VGroup>

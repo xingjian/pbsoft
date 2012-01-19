@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			public var userServiceQuery:RemoteObject;
+			public var userServiceDelete:RemoteObject;
+			[Bindable]
+			public var header:Array =  [{headerText:"ID号",dataField:"id",width:'250'},
+										{headerText:"姓名",dataField:"name",width:'150'},
+										{headerText:"邮箱",dataField:"email"}];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"查询",uri:"searchUser",icon:Icons.searchIcon},
+				{label:"增加",uri:"addUser",icon:Icons.addIcon},
+				{label:"修改",uri:"editUser",icon:Icons.editIcon},
+				{label:"删除",uri:"removeUser",icon:Icons.removeIcon},
+				{label:'分配权限',uri:'distributePower',icon:Icons.distributePower}]
+			
+			//初始化管理
+			private function init():void{
+				userServiceQuery = Global.getRemoteObject("pbUserService",userServiceQueryHandle);
+				userServiceDelete = Global.getRemoteObject("pbUserService",userServiceDeleteHandle);
+				userServiceQuery.getUserPageSupport(null,1,20);
+					
+			}
+			
+			//用户删除
+			public function userServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("用户删除成功！","PBSoft提示");
+			}
+			
+			//用户查询结果处理
+			public function userServiceQueryHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+				userServiceQuery.getUserPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
+			}
+			
+			//处理pbUserTW事件
+			public function pbUserTWEventHandle(event:AppEvent):void{
+				refresh(event);
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'distributePower':
+						if(pageGrid.selectedItem!=null){
+							var distributePower:DistributePower = new DistributePower();
+							distributePower.addEventListener(PBConstant.APP_DISTRIBUTEPOWERSUCCESS,powerSuccess);
+							distributePower.pbUser = pageGrid.selectedItem as PBUser;
+							PopUpManager.addPopUp(distributePower,this,true);
+							Global.centerPopUpPos(distributePower);
+						}else{
+							Alert.show("请选择相关人员！");
+						}
+						break;
+					case 'addUser':
+						var pbUserTW:PBUserTitleWindow = new PBUserTitleWindow();
+						pbUserTW.titleStr = "增加用户";
+						pbUserTW.addEventListener(PBConstant.APP_PBUSERTITLEWINDOW,pbUserTWEventHandle);
+						PopUpManager.addPopUp(pbUserTW,this,true);
+						Global.centerPopUpPos(pbUserTW);
+						break;
+					case 'removeUser':
+						var pbUser:PBUser = pageGrid.selectedItem as PBUser;
+						userServiceDelete.deletePBUser(pbUser.id);
+						break;
+					case 'editUser':
+						if(pageGrid.selectedItem!=null){
+							var pbUserTW_Edit:PBUserTitleWindow = new PBUserTitleWindow();
+							pbUserTW_Edit.titleStr = "修改用户";
+							pbUserTW_Edit.pbUser = pageGrid.selectedItem as PBUser;
+							pbUserTW_Edit.userType = false;
+							pbUserTW_Edit.addEventListener(PBConstant.APP_PBUSERTITLEWINDOW,pbUserTWEventHandle);
+							PopUpManager.addPopUp(pbUserTW_Edit,this,true);
+							Global.centerPopUpPos(pbUserTW_Edit);
+						}else{
+							Alert.show("请选择相关人员！");
+						}
+						break;
+				}
+			}
+			
+			public function powerSuccess(event:AppEvent):void{
+				refresh(event);
+			}
+			
+		]]>
+	</fx:Script>
+	<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+</s:VGroup>
