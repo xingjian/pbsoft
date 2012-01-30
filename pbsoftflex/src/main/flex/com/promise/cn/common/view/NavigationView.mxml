@@ -22,12 +22,17 @@
 			
 			[Bindable]
 			private var listNormalArray:ArrayList;
+			[Bindable]
+			private var listPlanArray:ArrayList;
 			
 			//初始化方法
 			public function init():void{
 				listNormalArray = Global.checkPowerArray([
 					{label:"用户管理",uri:"userManager",icon:Icons.userManager},
 					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager}]);
+				listPlanArray = Global.checkPowerArray([
+					{label:"计划管理",uri:"planManager",icon:Icons.plan}
+				]);
 			}
 			
 			//titleClick
@@ -35,10 +40,24 @@
 				dispatchEvent(new AppEvent(PBConstant.APP_NAVIGATION_LISTCHANGE,event.currentTarget.selectedItem.uri));
 			}
 			
+			//clearList
+			public function clearList(event:Event=null):void{
+				if(this.listPlan != null){
+					this.listPlan.selectedIndices = null;
+				}
+				if(this.listNormal != null){
+					this.listNormal.selectedIndices = null;
+				}
+			}
 		]]>
 	</fx:Script>
-	<mx:Accordion width="100%" height="100%">
-		<s:NavigatorContent id="nc1" label="系统管理" width="100%">
+	<mx:Accordion width="100%" height="100%" change="clearList(event)">
+		<s:NavigatorContent id="nc1" label="任务计划" width="100%">
+			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
+				<s:List id="listPlan" height="100%" width="100%" borderVisible="false" dataProvider="{listPlanArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
+			</s:VGroup>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="nc2" label="系统管理" width="100%">
 			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
 				<s:List id="listNormal" height="100%" width="100%" borderVisible="false" dataProvider="{listNormalArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
 			</s:VGroup>

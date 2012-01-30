@@ -1,6 +1,6 @@
 package com.promise.cn.common.vo
 {
-	import mx.collections.ArrayCollection;
+import mx.collections.ArrayCollection;
 
 [RemoteClass(alias="com.promise.cn.common.domain.PBUser")]
 [Bindable]

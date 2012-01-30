@@ -11,6 +11,7 @@
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.plan.view.PlanManagerView;
 			
 			import mx.core.IVisualElement;
 			
@@ -37,6 +38,8 @@
 					case 'userManager':
 						rightGroupAddElement(new UserManagerView());
 						break;
+					case 'planManager':
+						rightGroupAddElement(new PlanManagerView());
 				} 
 			}
 			
