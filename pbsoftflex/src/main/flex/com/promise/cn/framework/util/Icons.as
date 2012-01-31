@@ -27,6 +27,10 @@ public class Icons
 	public static const plan:Class;//任务计划
 	[Embed(source="../../../../../com/promise/cn/images/moneyconsumemanager.png")]
 	public static const moneyconsume:Class;//日常消费
+	[Embed(source="../../../../../com/promise/cn/images/dictmanager.png")]
+	public static const dict:Class;
+	[Embed(source="../../../../../com/promise/cn/images/save-icon.png")]
+	public static const saveIcon:Class;
 	
 	public function Icons()
 	{

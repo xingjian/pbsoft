@@ -31,7 +31,8 @@
 			public function init():void{
 				listNormalArray = Global.checkPowerArray([
 					{label:"用户管理",uri:"userManager",icon:Icons.userManager},
-					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager}]);
+					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager},
+					{label:"字典管理",uri:"dictManager",icon:Icons.dict}]);
 				listPlanArray = Global.checkPowerArray([
 					{label:"计划管理",uri:"planManager",icon:Icons.plan}
 				]);

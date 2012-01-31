@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="增加字典" close="closeWindow()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="init()"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="324" height="172">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name ="addDictEvent",type ="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.Dict;
+			import com.promise.cn.framework.event.AppEvent;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			
+			//初始化方法
+			public function init():void{
+			
+			}
+			
+			//关闭窗口
+			public function closeWindow():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//保存
+			public function saveBtnClick():void{
+				if(dictName.text==""||dictCode.text==""){
+					Alert.show("字典名称和字典编码不能为空！","系统提示");
+				}else{
+					var dict:Dict = new Dict();
+					dict.code = dictCode.text;
+					dict.name = dictName.text;
+					dispatchEvent(new AppEvent("addDictEvent",dict));
+				}
+				
+			}
+			
+			//重置
+			public function resetBtnClick():void{
+				dictName.text = "";
+				dictCode.text = "";
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label x="39" y="14" height="18" text="字典名称：" verticalAlign="middle"/>
+	<s:Label x="39" y="59" height="18" text="字典编码：" verticalAlign="middle"/>
+	<s:TextInput x="127" y="14" width="161" id="dictName"/>
+	<s:TextInput x="127" y="59" width="161" id="dictCode"/>
+	<s:Button x="39" y="105" label="保存" click="saveBtnClick()"/>
+	<s:Button x="129" y="105" label="重置" click="resetBtnClick()"/>
+	<s:Button x="217" y="105" label="关闭" click="closeWindow()"/>
+</s:TitleWindow>

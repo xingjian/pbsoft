@@ -43,6 +43,9 @@
 						rightGroupAddElement(new PlanManagerView());
 					case 'moneyconsumeManager':
 						rightGroupAddElement(new MoneyConsumeManagerView());
+					case 'dictManager':
+						rightGroupAddElement(new DictManagerView());
+						
 				} 
 			}
 			

@@ -30,7 +30,7 @@
 				{label:"增加",uri:"addUser",icon:Icons.addIcon},
 				{label:"修改",uri:"editUser",icon:Icons.editIcon},
 				{label:"删除",uri:"removeUser",icon:Icons.removeIcon},
-				{label:'分配权限',uri:'distributePower',icon:Icons.distributePower}]
+				{label:'分配权限',uri:'distributePower',icon:Icons.distributePower}];
 			
 			//初始化管理
 			private function init():void{

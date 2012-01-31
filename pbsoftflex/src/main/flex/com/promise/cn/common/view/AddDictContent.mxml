@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="增加字典" close="closeWindow()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="init()"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="324" height="248">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name ="addDictContentEvent",type ="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.Dict;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.framework.event.AppEvent;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var dict:Dict;
+			
+			//初始化方法
+			public function init():void{
+			
+			}
+			
+			//关闭窗口
+			public function closeWindow():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//保存
+			public function saveBtnClick():void{
+				if(dictContentName.text==""||dictContentCode.text==""){
+					Alert.show("字典内容名称和字典内容编码不能为空！","系统提示");
+				}else{
+					var dictContent:DictContent = new DictContent();
+					dictContent.code = dictContentCode.text;
+					dictContent.name = dictContentName.text;
+					dictContent.dict = dict;
+					dispatchEvent(new AppEvent("addDictContentEvent",dictContent));
+				}
+				
+			}
+			
+			//重置
+			public function resetBtnClick():void{
+				dictContentName.text = "";
+				dictContentCode.text = "";
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label x="39" y="14" height="18" text="字典名称：" verticalAlign="middle"/>
+	<s:Label x="39" y="55" height="18" text="字典编码：" verticalAlign="middle"/>
+	<s:Label id="dictName" x="127" y="14" width="161" height="18" text="{dict.name}"
+			 verticalAlign="middle"/>
+	<s:Label id="dictCode" x="127" y="54" width="161" height="19" text="{dict.code}"
+			 verticalAlign="middle"/>
+	<s:Button x="39" y="177" label="保存" click="saveBtnClick()"/>
+	<s:Button x="129" y="177" label="重置" click="resetBtnClick()"/>
+	<s:Button x="217" y="177" label="关闭" click="closeWindow()"/>
+	<s:Label x="39" y="92" height="18" text="字典内容名称：" verticalAlign="middle"/>
+	<s:Label x="39" y="130" height="18" text="字典内容编码：" verticalAlign="middle"/>
+	<s:TextInput x="127" y="92" width="161" id="dictContentName"/>
+	<s:TextInput x="127" y="130" width="161" id="dictContentCode"/>
+</s:TitleWindow>
