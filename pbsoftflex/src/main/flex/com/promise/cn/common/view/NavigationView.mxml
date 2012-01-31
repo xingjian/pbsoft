@@ -24,6 +24,8 @@
 			private var listNormalArray:ArrayList;
 			[Bindable]
 			private var listPlanArray:ArrayList;
+			[Bindable]
+			private var listMoneyConsumeArray:ArrayList;
 			
 			//初始化方法
 			public function init():void{
@@ -33,6 +35,23 @@
 				listPlanArray = Global.checkPowerArray([
 					{label:"计划管理",uri:"planManager",icon:Icons.plan}
 				]);
+				listMoneyConsumeArray = Global.checkPowerArray([
+					{label:"消费管理",uri:"moneyconsumeManager",icon:Icons.moneyconsume}
+				]);
+				initAccordion();
+			}
+			
+			//初始化accordion
+			public function initAccordion():void{
+			 	if(listNormalArray.length==0){
+					accordion.removeElement(nc3);
+				}
+				if(listPlanArray.length==0){
+					accordion.removeElement(nc1);
+				}
+				if(listMoneyConsumeArray.length==0){
+					accordion.removeElement(nc2);
+				}
 			}
 			
 			//titleClick
@@ -48,17 +67,25 @@
 				if(this.listNormal != null){
 					this.listNormal.selectedIndices = null;
 				}
+				if(this.listMoneyConsume != null){
+					this.listMoneyConsume.selectedIndices = null;
+				}
 			}
 		]]>
 	</fx:Script>
-	<mx:Accordion width="100%" height="100%" change="clearList(event)">
+	<mx:Accordion id="accordion" width="100%" height="100%" change="clearList(event)">
 		<s:NavigatorContent id="nc1" label="任务计划" width="100%">
 			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
 				<s:List id="listPlan" height="100%" width="100%" borderVisible="false" dataProvider="{listPlanArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
 			</s:VGroup>
 		</s:NavigatorContent>
-		<s:NavigatorContent id="nc2" label="系统管理" width="100%">
+		<s:NavigatorContent id="nc2" label="日常消费" width="100%">
 			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
+				<s:List id="listMoneyConsume" height="100%" width="100%" borderVisible="false" dataProvider="{listMoneyConsumeArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
+			</s:VGroup>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="nc3" label="系统管理" width="100%">
+			<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="top" >
 				<s:List id="listNormal" height="100%" width="100%" borderVisible="false" dataProvider="{listNormalArray}" changing="tileClick(event)" itemRenderer="com.promise.cn.common.renderer.ListItemRenderer" />
 			</s:VGroup>
 		</s:NavigatorContent>

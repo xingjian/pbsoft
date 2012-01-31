@@ -11,6 +11,7 @@
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.moneyconsume.view.MoneyConsumeManagerView;
 			import com.promise.cn.plan.view.PlanManagerView;
 			
 			import mx.core.IVisualElement;
@@ -40,6 +41,8 @@
 						break;
 					case 'planManager':
 						rightGroupAddElement(new PlanManagerView());
+					case 'moneyconsumeManager':
+						rightGroupAddElement(new MoneyConsumeManagerView());
 				} 
 			}
 			

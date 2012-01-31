@@ -24,7 +24,9 @@ public class Icons
 	[Embed(source="../../../../../com/promise/cn/images/distribute-icon.png")]
 	public static const distributePower:Class;//分配权限
 	[Embed(source="../../../../../com/promise/cn/images/plan.png")]
-	public static const plan:Class;
+	public static const plan:Class;//任务计划
+	[Embed(source="../../../../../com/promise/cn/images/moneyconsumemanager.png")]
+	public static const moneyconsume:Class;//日常消费
 	
 	public function Icons()
 	{

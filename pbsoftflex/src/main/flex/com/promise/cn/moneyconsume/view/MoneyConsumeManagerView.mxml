@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Icons;
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"消费人",dataField:"pbUser.name",width:'100'},
+				{headerText:"金额",dataField:"num",width:'100'},
+				{headerText:"消费类型",dataField:"consumeType.name",width:'150'},
+				{headerText:"消费时间",dataField:"consumeDate",width:'150'},
+				{headerText:"记录时间",dataField:"sysDate",width:'150'},
+				{headerText:"消费描述",dataField:"describe",width:'250'}
+				];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"查询",uri:"searchMoneyConsume",icon:Icons.searchIcon},
+				{label:"增加",uri:"addMoneyConsume",icon:Icons.addIcon},
+				{label:"修改",uri:"editMoneyConsume",icon:Icons.editIcon},
+				{label:"删除",uri:"removeMoneyConsume",icon:Icons.removeIcon}]
+			
+			//初始化方法
+			public function init():void{
+			
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'searchMoneyConsume':
+						break;
+					case 'addMoneyConsume':
+						break;
+					case 'editMoneyConsume':
+						break;
+					case 'removeMoneyConsume':
+						break;
+				}
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+			}
+			
+		]]>
+	</fx:Script>
+	<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+</s:VGroup>
