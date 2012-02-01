@@ -19,9 +19,19 @@
 				PopUpManager.removePopUp(this);
 			}
 			
+			//reset按钮
+			public function resetBtnClick():void{
+			
+			}
+			
+			//save按钮事件
+			public function saveBtnClick():void{
+			
+			}
+			
 		]]>
 	</fx:Script>
-	<mx:DateField x="60" y="10" width="108"/>
+	<mx:DateField x="60" y="10" width="108" />
 	<s:Label x="10" y="10" width="42" height="23" text="日期：" verticalAlign="middle"/>
 	<s:Label x="194" y="10" height="23" text="人员：" verticalAlign="middle"/>
 	<s:ComboBox x="238" y="10" width="126"/>
@@ -31,6 +41,7 @@
 	<s:ComboBox x="238" y="53" width="126"/>
 	<s:Label x="10" y="94" text="描述："/>
 	<s:TextArea x="10" y="114" width="354" height="60"/>
-	<s:Button x="69" y="186" label="保存"/>
-	<s:Button x="231" y="186" label="取消"/>
+	<s:Button x="68" y="186" label="保存" click="saveBtnClick()"/>
+	<s:Button x="256" y="186" label="关闭" click="closeWindow()"/>
+	<s:Button x="163" y="186" label="重置" click="resetBtnClick()"/>
 </s:TitleWindow>

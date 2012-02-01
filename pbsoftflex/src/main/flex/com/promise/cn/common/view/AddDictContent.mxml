@@ -54,10 +54,8 @@
 	</fx:Script>
 	<s:Label x="39" y="14" height="18" text="字典名称：" verticalAlign="middle"/>
 	<s:Label x="39" y="55" height="18" text="字典编码：" verticalAlign="middle"/>
-	<s:Label id="dictName" x="127" y="14" width="161" height="18" text="{dict.name}"
-			 verticalAlign="middle"/>
-	<s:Label id="dictCode" x="127" y="54" width="161" height="19" text="{dict.code}"
-			 verticalAlign="middle"/>
+	<s:Label id="dictName" x="127" y="14" width="161" height="18" text="{dict.name}" verticalAlign="middle"/>
+	<s:Label id="dictCode" x="127" y="54" width="161" height="19" text="{dict.code}" verticalAlign="middle"/>
 	<s:Button x="39" y="177" label="保存" click="saveBtnClick()"/>
 	<s:Button x="129" y="177" label="重置" click="resetBtnClick()"/>
 	<s:Button x="217" y="177" label="关闭" click="closeWindow()"/>

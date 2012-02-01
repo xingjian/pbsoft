@@ -29,16 +29,23 @@
 			private var dictServiceAdd:RemoteObject;
 			[Bindable]
 			private var dictContentServiceAdd:RemoteObject;
+			private var dictContentServiceSearch:RemoteObject;
 			[Bindable]
 			private var linkButtons:Array = [{label:"增加",uri:"addDictContent",icon:Icons.addIcon},
 				{label:"修改",uri:"editDictContent",icon:Icons.editIcon},
 				{label:"删除",uri:"removeDictContent",icon:Icons.removeIcon},
-				{label:"保存",uri:"saveDictContent",icon:Icons.saveIcon}]
+				{label:"保存",uri:"saveDictContent",icon:Icons.saveIcon}];
+			[Bindable]
+			public var header:Array =  [{headerText:"字典名称",dataField:"dict.name",width:'250'},
+				{headerText:"字典内容名称",dataField:"name",width:'250'},
+				{headerText:"字典内容编码",dataField:"code"}];
+				
 			//初始化方法
 			public function init():void{
 				dictServiceList = Global.getRemoteObject("dictService",dictServiceListHandle);
 				dictServiceAdd = Global.getRemoteObject("dictService",dictServiceAddHandle);
 				dictContentServiceAdd = Global.getRemoteObject("dictService",dictContentServiceAddHandle);
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
 				dictServiceList.listDict();
 			}
 			
@@ -82,10 +89,10 @@
 				switch(uri){
 					case 'addDictContent':
 						if(dictTree.selectedIndex!=-1){
-							var dict:Dict = dictTree.selectedItem as Dict;
+							var dict:Object = dictTree.selectedItem;
 							if(dict.id!="root"){
 								var addDictContent:AddDictContent = new AddDictContent();
-								addDictContent.dict = dict;
+								addDictContent.dict = dict as Dict;
 								addDictContent.addEventListener("addDictContentEvent",addDictContentEventHandle);
 								PopUpManager.addPopUp(addDictContent,this,true);
 								Global.centerPopUpPos(addDictContent);
@@ -134,16 +141,33 @@
 				var retStr:String = event.result as String;
 				if(retStr=="success"){
 					dictServiceList.listDict();
+					dictTreeClick(null);
 					Alert.show("保存成功！","系统提示");
 				}else{
 					Alert.show("保存失败！","系统提示");
 				}
 			}
 			
+			//字典树的点击事件
+			public function dictTreeClick(event:MouseEvent=null):void{
+				var dict:Object = dictTree.selectedItem;
+				if(dict.id!="root"){
+					dictContentServiceSearch.listDictContent(dict.code);
+				}
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				pageGrid.dataGrid.dataProvider = dictContentList;
+			}
+			
+			
 		]]>
 	</fx:Script>
-	<mx:Tree id="dictTree" width="20%" height="100%" labelField="name" dataProvider="{treeData}" />
+	<mx:Tree id="dictTree" width="20%" height="100%" click="dictTreeClick(event)" labelField="name" dataProvider="{treeData}" />
 	<s:VGroup width="80%" height="100%">
 		<view:CustomLinkBar id="clb" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<view:PageGrid id="pageGrid" width="100%" height="100%" showPageParams="false" header="{header}" />
 	</s:VGroup>
 </s:HGroup>
