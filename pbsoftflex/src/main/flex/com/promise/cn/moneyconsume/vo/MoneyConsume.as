@@ -12,7 +12,7 @@ package com.promise.cn.moneyconsume.vo
 		public var  num:Number;
 		public var  pbUser:PBUser;
 		public var  consumeDate:String;
-		public var  describe:String;
+		public var  remark:String;
 		public var  sysDate:String;
 		
 		public function MoneyConsume(object:Object=null){
@@ -22,7 +22,7 @@ package com.promise.cn.moneyconsume.vo
 				this.num = object.num;
 				this.pbUser = object.pbUser;
 				this.consumeDate = object.consumeDate;
-				this.describe = object.describe;
+				this.remark = object.remark;
 				this.sysDate = object.sysDate;
 			}
 		}

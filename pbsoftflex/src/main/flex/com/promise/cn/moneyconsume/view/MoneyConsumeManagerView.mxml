@@ -10,8 +10,13 @@
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
 			
 			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			private var moneyConsumeServiceList:RemoteObject;
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"消费人",dataField:"pbUser.name",width:'100'},
@@ -19,7 +24,7 @@
 				{headerText:"消费类型",dataField:"consumeType.name",width:'150'},
 				{headerText:"消费时间",dataField:"consumeDate",width:'150'},
 				{headerText:"记录时间",dataField:"sysDate",width:'150'},
-				{headerText:"消费描述",dataField:"describe",width:'250'}
+				{headerText:"消费描述",dataField:"remark",width:'250'}
 				];
 			
 			[Bindable]
@@ -30,7 +35,13 @@
 			
 			//初始化方法
 			public function init():void{
+				moneyConsumeServiceList = Global.getRemoteObject("moneyConsumeService",moneyConsumeServiceListHandle);
+				moneyConsumeServiceList.getMoneyConsumePageSupport(null,1,20);
+			}
 			
+			//获取消费记录查询
+			public function moneyConsumeServiceListHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
 			}
 			
 			//linkBarClick事件
@@ -41,6 +52,7 @@
 						break;
 					case 'addMoneyConsume':
 						var addMoneyConsume:AddMoneyConsume = new AddMoneyConsume();
+						addMoneyConsume.addEventListener(PBConstant.APP_MONEYCONSUMETITLEWINDOW,addMoneyConsumeHandle);
 						PopUpManager.addPopUp(addMoneyConsume,this,true);
 						Global.centerPopUpPos(addMoneyConsume);
 						break;
@@ -51,8 +63,14 @@
 				}
 			}
 			
+			//增加消费记录成功
+			public function addMoneyConsumeHandle(event:AppEvent):void{
+				refresh(event);
+			}
+			
 			//刷新
 			public function refresh(event:AppEvent):void{
+				moneyConsumeServiceList.getMoneyConsumePageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
 			}
 			
 		]]>

@@ -41,10 +41,13 @@
 						break;
 					case 'planManager':
 						rightGroupAddElement(new PlanManagerView());
+						break;
 					case 'moneyconsumeManager':
 						rightGroupAddElement(new MoneyConsumeManagerView());
+						break;
 					case 'dictManager':
 						rightGroupAddElement(new DictManagerView());
+						break;
 						
 				} 
 			}

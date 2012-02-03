@@ -7,6 +7,7 @@
  **/
 package com.promise.cn.framework.util
 {
+	import mx.formatters.DateFormatter;
 	
 	public class PBUtil
 	{
@@ -39,6 +40,13 @@ package com.promise.cn.framework.util
 				checkCode += code;
 			}
 			return checkCode;
+		}
+		
+		//日期转换成字符串
+		public static function DateToString(formatString:String,date:Date):String{
+			var myDateFormatter:DateFormatter = new DateFormatter();
+			myDateFormatter.formatString = formatString;
+			return myDateFormatter.format(date);
 		}
 	}
 }

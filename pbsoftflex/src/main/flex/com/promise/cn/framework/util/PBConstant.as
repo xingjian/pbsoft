@@ -22,5 +22,6 @@ package com.promise.cn.framework.util
 		public static const APP_CUSTOMLINKBAR:String = "customLinkBarEvent";
 		public static const APP_DISTRIBUTEPOWERSUCCESS:String = "distributePowerSuccess";
 		public static const APP_PBUSERTITLEWINDOW:String = "freshPBUser";
+		public static const APP_MONEYCONSUMETITLEWINDOW:String = "freshMoneyConsume";
 	}
 }
