@@ -26,5 +26,9 @@ package com.promise.cn.moneyconsume.vo
 				this.sysDate = object.sysDate;
 			}
 		}
+		
+		public function get numTwo():Number{
+			return Number(num.toFixed(2));
+		}
 	}
 }

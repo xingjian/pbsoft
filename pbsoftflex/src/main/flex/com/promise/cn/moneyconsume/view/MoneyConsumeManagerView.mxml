@@ -11,16 +11,19 @@
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.moneyconsume.vo.MoneyConsume;
 			
+			import mx.controls.Alert;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.mxml.RemoteObject;
 			
 			private var moneyConsumeServiceList:RemoteObject;
+			private var moneyConsumeServiceDelete:RemoteObject;
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"消费人",dataField:"pbUser.name",width:'100'},
-				{headerText:"金额",dataField:"num",width:'100'},
+				{headerText:"金额",dataField:"numTwo",width:'100'},
 				{headerText:"消费类型",dataField:"consumeType.name",width:'150'},
 				{headerText:"消费时间",dataField:"consumeDate",width:'150'},
 				{headerText:"记录时间",dataField:"sysDate",width:'150'},
@@ -37,6 +40,13 @@
 			public function init():void{
 				moneyConsumeServiceList = Global.getRemoteObject("moneyConsumeService",moneyConsumeServiceListHandle);
 				moneyConsumeServiceList.getMoneyConsumePageSupport(null,1,20);
+				moneyConsumeServiceDelete = Global.getRemoteObject("moneyConsumeService",moneyConsumeServiceDeleteHandle);
+			}
+			
+			//删除成功
+			public function moneyConsumeServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("消费记录删除成功！","系统提示");
 			}
 			
 			//获取消费记录查询
@@ -49,17 +59,60 @@
 				var uri:String = event.data.uri;
 				switch(uri){
 					case 'searchMoneyConsume':
+						searchMoneyConsume();
 						break;
 					case 'addMoneyConsume':
-						var addMoneyConsume:AddMoneyConsume = new AddMoneyConsume();
-						addMoneyConsume.addEventListener(PBConstant.APP_MONEYCONSUMETITLEWINDOW,addMoneyConsumeHandle);
-						PopUpManager.addPopUp(addMoneyConsume,this,true);
-						Global.centerPopUpPos(addMoneyConsume);
+						addaddMoneyConsume();
 						break;
 					case 'editMoneyConsume':
+						editMoneyConsume();
 						break;
 					case 'removeMoneyConsume':
+						removeMoneyConsume();
 						break;
+				}
+			}
+			//查询面板
+			public function searchMoneyConsume():void{
+				var searchMoneyConsume:SearchMoneyConsume = new SearchMoneyConsume();
+				searchMoneyConsume.addEventListener(PBConstant.APP_MONEYCONSUMESEARCH,searchMoneyConsumeSuccess);
+				PopUpManager.addPopUp(searchMoneyConsume,this,true);
+				Global.centerPopUpPos(searchMoneyConsume);
+			}
+			
+			//查询成功
+			public function searchMoneyConsumeSuccess(event:AppEvent):void{
+				pageGrid.setList(event.data);
+			}
+			
+			//editMoneyConsume
+			public function editMoneyConsume():void{
+				if(null!=pageGrid.selectedItem){
+					var editMoneyConsume:EditMoneyConsume = new EditMoneyConsume();
+					editMoneyConsume.editMoneyConsume = pageGrid.selectedItem as MoneyConsume;
+					editMoneyConsume.addEventListener(PBConstant.APP_MONEYCONSUMETITLEWINDOW,addMoneyConsumeHandle);
+					PopUpManager.addPopUp(editMoneyConsume,this,true);
+					Global.centerPopUpPos(editMoneyConsume);
+				}else{
+					Alert.show("请选择一条消费记录进行修改！","系统提示");
+				}
+				
+			}
+			
+			//addMoneyConsume
+			public function addaddMoneyConsume():void{
+				var addMoneyConsume:AddMoneyConsume = new AddMoneyConsume();
+				addMoneyConsume.addEventListener(PBConstant.APP_MONEYCONSUMETITLEWINDOW,addMoneyConsumeHandle);
+				PopUpManager.addPopUp(addMoneyConsume,this,true);
+				Global.centerPopUpPos(addMoneyConsume);
+			}
+			
+			//removeMoneyConsume
+			public function removeMoneyConsume():void{
+				if(null!=pageGrid.selectedItem){
+					moneyConsumeServiceDelete.deleteMoneyConsume(pageGrid.selectedItem.id);
+				}else{
+					Alert.show("请选择一条消费记录！","系统提示");
 				}
 			}
 			

@@ -48,5 +48,10 @@ package com.promise.cn.framework.util
 			myDateFormatter.formatString = formatString;
 			return myDateFormatter.format(date);
 		}
+		//字符串变成日期MM-DD-YYYY
+		public static function StringToDate(date:String):Date{
+			var dateArray:Array = date.split("-");
+			return new Date(dateArray[2],dateArray[0]-1,dateArray[1]);
+		}
 	}
 }

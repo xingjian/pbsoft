@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="查询消费记录" creationComplete="init()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow()" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="452" height="252">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.vo.QueryObject;
+			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			private var consumeTypeCBData:ArrayCollection;
+			[Bindable]
+			private var consumePersonCBData:ArrayCollection;
+			private var userServiceQuery:RemoteObject;
+			private var dictContentServiceSearch:RemoteObject;
+			[Bindable]
+			private var consumeServiceSearch:RemoteObject;
+			
+			//初始化方法
+			public function init():void{
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
+				userServiceQuery = Global.getRemoteObject("pbUserService",userServiceQueryHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.CONSUMETYPE);
+				userServiceQuery.getPBUserList();
+				consumeServiceSearch = Global.getRemoteObject("moneyConsumeService",moneyConsumeServiceSearchHandle);
+			}
+			
+			//查询成功
+			public function moneyConsumeServiceSearchHandle(event:ResultEvent):void{
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_MONEYCONSUMESEARCH,event);
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				consumeTypeCBData = dictContentList;
+				var object:Object = {id:"all",name:"全部"};
+				consumeTypeCBData.addItemAt(object,0);
+				consumeTypeCB.selectedIndex = 0;
+			}
+			
+			//用户查询结果处理
+			public function userServiceQueryHandle(event:ResultEvent):void{
+				consumePersonCBData = event.result as ArrayCollection;
+				var object:Object = {id:"all",name:"全部"};
+				consumePersonCBData.addItemAt(object,0);
+				consumePersonCB.selectedIndex = 0;
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//查询按钮点击事件
+			public function searchBtnClick():void{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "consumeDate";
+				valueObject1.value = startDF.text;
+				valueObject1.queryType = "2";
+				valueList.push(valueObject1);
+				var valueObject2:QueryObject = new QueryObject();//结束时间
+				valueObject2.key = "consumeDate";
+				valueObject2.value = endDF.text;
+				valueObject2.queryType = "3";
+				valueList.push(valueObject2);
+				if(consumePersonCB.selectedIndex>0){//消费人
+					var pbUser:PBUser = consumePersonCB.selectedItem as PBUser;
+					var valueObject3:QueryObject = new QueryObject();
+					valueObject3.key = "pbUser.id";
+					valueObject3.value = pbUser.id;
+					valueObject3.queryType = "0";
+					valueList.push(valueObject3);
+				}
+				
+				if(consumeTypeCB.selectedIndex>0){//消费类型
+					var consumeTypeDC:DictContent = consumeTypeCB.selectedItem as DictContent;
+					var valueObject4:QueryObject = new QueryObject();
+					valueObject4.key = "consumeType.id";
+					valueObject4.value = consumeTypeDC.id;
+					valueObject4.queryType = "0";
+					valueList.push(valueObject4);
+				}
+				if(remarkText.text!=""){//描述
+					var valueObject5:QueryObject = new QueryObject();
+					valueObject5.key = "remark";
+					valueObject5.value = remarkText.text;
+					valueObject5.queryType = "1";
+					valueList.push(valueObject5);
+				}
+				consumeServiceSearch.getMoneyConsumePageSupport(valueList,1,10000);
+			}
+			
+			//重置按钮
+			public function resetBtnClick():void{
+				consumePersonCB.selectedIndex = 0;
+				consumeTypeCB.selectedIndex = 0;
+				remarkText.text = "";
+				startDF.selectedDate = new Date();
+				endDF.selectedDate = new Date();
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:DateField id="startDF" x="78" y="10" width="136" selectedDate="{new Date()}" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+	<mx:DateField id="endDF" x="306" y="10" width="136" selectedDate="{new Date()}" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+	<s:Label x="236" y="10" width="68" height="23" text="结束日期：" verticalAlign="middle"/>
+	<s:Label x="10" y="10" width="60" height="23" text="开始日期：" verticalAlign="middle"/>
+	<s:Label x="12" y="54" height="23" text="人员：" verticalAlign="middle"/>
+	<s:ComboBox id="consumePersonCB" dataProvider="{consumePersonCBData}" labelField="name" x="77" y="54" width="133" />
+	<s:Label x="237" y="53" height="23" text="类型：" verticalAlign="middle"/>
+	<s:ComboBox id="consumeTypeCB" dataProvider="{consumeTypeCBData}" labelField="name" x="306" y="53" width="134"/>
+	<s:Label x="10" y="94" text="描述："/>
+	<s:TextArea x="10" y="114"  id="remarkText" width="430" height="60"/>
+	<s:Button id="searchBtn" x="100" y="188" label="查询" click="searchBtnClick()"/>
+	<s:Button x="288" y="188" label="关闭" click="closeWindow()"/>
+	<s:Button x="195" y="188" label="重置" click="resetBtnClick()"/>
+</s:TitleWindow>

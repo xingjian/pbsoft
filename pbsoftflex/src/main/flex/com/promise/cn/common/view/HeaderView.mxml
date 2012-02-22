@@ -12,6 +12,8 @@
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
 			
+			import mx.controls.LinkButton;
+			
 			import spark.components.Label;
 			
 			[Bindable]
@@ -28,6 +30,16 @@
 				var userInfoLabel:Label = new Label();
 				userInfoLabel.text = '欢迎 '+pbUser.name+' 登录PBSoft!';
 				userInfoHG.addElement(userInfoLabel);
+				var exitBtn:LinkButton = new LinkButton();
+				exitBtn.label = "退出系统";
+				exitBtn.addEventListener(MouseEvent.CLICK,exitSystem);
+				userInfoHG.addElement(exitBtn);
+			}
+			
+			//退出登录
+			public function exitSystem(event:MouseEvent=null):void{
+				var request:URLRequest=new URLRequest("javascript:location.reload();");
+				navigateToURL(request,"_self"); 
 			}
 		]]>
 	</fx:Script>

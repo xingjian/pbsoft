@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="修改消费记录" creationComplete="init()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow()"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="376" height="246">
+	<fx:Declarations>
+		<fx:Array id="validators">
+			<mx:NumberValidator id="consumeNumValidator" trigger="{saveBtn}" invalidCharError="消费金额必须是数字类型！" source="{numText}" property="text" required="true" requiredFieldError="消费金额不能为空！" />
+		</fx:Array>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.common.vo.PBUser;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.moneyconsume.vo.MoneyConsume;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			import mx.validators.Validator;
+			
+			[Bindable]
+			private var consumeTypeCBData:ArrayCollection;
+			[Bindable]
+			private var consumePersonCBData:ArrayCollection;
+			private var userServiceQuery:RemoteObject;
+			private var dictContentServiceSearch:RemoteObject;
+			[Bindable]
+			private var consumeServiceUpdate:RemoteObject;
+			[Bindable]
+			public var editMoneyConsume:MoneyConsume;
+			
+			//初始化事件
+			public function init():void{
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
+				userServiceQuery = Global.getRemoteObject("pbUserService",userServiceQueryHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.CONSUMETYPE);
+				userServiceQuery.getPBUserList();
+				consumeServiceUpdate = Global.getRemoteObject("moneyConsumeService",moneyConsumeServiceHandle);
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				consumeTypeCBData = dictContentList;
+				consumeTypeCB.selectedItem = editMoneyConsume.consumeType;
+			}
+			
+			//用户查询结果处理
+			public function userServiceQueryHandle(event:ResultEvent):void{
+				consumePersonCBData = event.result as ArrayCollection;
+				consumePersonCB.selectedItem=editMoneyConsume.pbUser;
+			}
+			
+			//关闭窗口
+			public function closeWindow():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//reset按钮
+			public function resetBtnClick():void{
+				remarkText.text = "";
+				numText.text = "";
+			}
+			
+			//save按钮事件
+			public function saveBtnClick():void{
+				var validatorErrorArray:Array = Validator.validateAll(validators);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if(isValidForm){
+					editMoneyConsume.consumeType = consumeTypeCB.selectedItem as DictContent;
+					editMoneyConsume.consumeDate = dateField.text;
+					editMoneyConsume.remark = remarkText.text;
+					editMoneyConsume.num = Number(numText.text);
+					editMoneyConsume.pbUser = consumePersonCB.selectedItem as PBUser;
+					editMoneyConsume.sysDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+					consumeServiceUpdate.updateMoneyConsume(editMoneyConsume);
+				}
+			}
+			
+			//保存消费记录成功
+			public function moneyConsumeServiceHandle(event:ResultEvent):void{
+				Alert.show("保存消费记录成功！","系统提示");
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_MONEYCONSUMETITLEWINDOW,"success");
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+		]]>
+	</fx:Script>
+	<mx:DateField x="51" y="10" width="136" id="dateField" selectedDate="{PBUtil.StringToDate(editMoneyConsume.consumeDate)}" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+	<s:Label x="10" y="10" width="42" height="23" text="日期：" verticalAlign="middle"/>
+	<s:Label x="194" y="10" height="23" text="人员：" verticalAlign="middle"/>
+	<s:ComboBox id="consumePersonCB" dataProvider="{consumePersonCBData}" labelField="name" x="238" y="10" width="126" />
+	<s:Label x="10" y="53" width="42" height="22" text="金额：" verticalAlign="middle"/>
+	<s:TextInput x="51" id="numText" y="53" text="{editMoneyConsume.numTwo}" width="108"/>
+	<s:Label x="194" y="53" height="23" text="类型：" verticalAlign="middle"/>
+	<s:ComboBox id="consumeTypeCB" dataProvider="{consumeTypeCBData}" labelField="name" x="238" y="53" width="126"/>
+	<s:Label x="10" y="94" text="描述："/>
+	<s:TextArea x="10" y="114"  id="remarkText" text="{editMoneyConsume.remark}" width="354" height="60"/>
+	<s:Button id="saveBtn" x="68" y="186" label="保存" click="saveBtnClick()"/>
+	<s:Button x="256" y="186" label="关闭" click="closeWindow()"/>
+	<s:Button x="163" y="186" label="重置" click="resetBtnClick()"/>
+</s:TitleWindow>

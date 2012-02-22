@@ -23,5 +23,6 @@ package com.promise.cn.framework.util
 		public static const APP_DISTRIBUTEPOWERSUCCESS:String = "distributePowerSuccess";
 		public static const APP_PBUSERTITLEWINDOW:String = "freshPBUser";
 		public static const APP_MONEYCONSUMETITLEWINDOW:String = "freshMoneyConsume";
+		public static const APP_MONEYCONSUMESEARCH:String = "appMoneySumeSearch";
 	}
 }
