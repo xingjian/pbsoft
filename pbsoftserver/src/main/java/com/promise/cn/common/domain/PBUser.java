@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -23,6 +25,9 @@ import org.hibernate.annotations.GenericGenerator;
  * @日期: 2011-11-14 下午09:54:31 
  * @版本 V1.0   
  */
+@NamedQueries({
+	@NamedQuery(name="listPBUser",query="select t from PBUser t")
+})
 @SuppressWarnings("all")
 @Entity
 @Table(name="pb_user")

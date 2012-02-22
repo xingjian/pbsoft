@@ -3,6 +3,8 @@ package com.promise.cn.consume.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -28,6 +30,7 @@ import com.promise.cn.common.domain.PBUser;
 @NamedQueries({
 	@NamedQuery(name="listMoneyConsumeByUserID",query="select t from MoneyConsume t where t.pbUser.id=? order by t.consumeDate asc")
 })
+@Entity
 @SuppressWarnings("all")
 @Table(name = "moneyconsume")
 public class MoneyConsume implements Serializable {
@@ -37,7 +40,7 @@ public class MoneyConsume implements Serializable {
 	private float num;
 	private PBUser pbUser;
 	private String consumeDate;
-	private String describe;
+	private String remark;
 	private String sysDate;
 	
 	@Id
@@ -52,7 +55,7 @@ public class MoneyConsume implements Serializable {
 	}
 	
 	@ManyToOne(targetEntity=DictContent.class,fetch=FetchType.EAGER)
-    @JoinColumn(name="consumeType")
+    @JoinColumn(name="consumetype")
 	public DictContent getConsumeType() {
 		return consumeType;
 	}
@@ -61,6 +64,7 @@ public class MoneyConsume implements Serializable {
 		this.consumeType = consumeType;
 	}
 	
+	@Basic
 	public float getNum() {
 		return num;
 	}
@@ -78,7 +82,7 @@ public class MoneyConsume implements Serializable {
 	public void setPbUser(PBUser pbUser) {
 		this.pbUser = pbUser;
 	}
-	
+	@Basic
 	public String getConsumeDate() {
 		return consumeDate;
 	}
@@ -87,14 +91,15 @@ public class MoneyConsume implements Serializable {
 		this.consumeDate = consumeDate;
 	}
 	
-	public String getDescribe() {
-		return describe;
+	public String getRemark() {
+		return remark;
 	}
-	
-	public void setDescribe(String describe) {
-		this.describe = describe;
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
-	
+
+	@Basic
 	public String getSysDate() {
 		return sysDate;
 	}

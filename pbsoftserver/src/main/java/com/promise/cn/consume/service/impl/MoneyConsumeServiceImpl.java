@@ -13,6 +13,8 @@ import com.promise.cn.consume.domain.MoneyConsume;
 import com.promise.cn.consume.service.MoneyConsumeService;
 import com.promise.cn.framework.service.PersistenceManager;
 import com.promise.cn.framework.service.QueryManager;
+import com.promise.cn.framework.support.PageSupport;
+import com.promise.cn.framework.support.QueryObject;
 
 /**   
  * @类名: MoneyConsumeServiceImpl.java 
@@ -40,7 +42,7 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 	@Override
 	@RemotingInclude
 	public String saveMoneyConsume(MoneyConsume moneyConsume) {
-		log.debug("saveMoneyConsume="+moneyConsume.getDescribe());
+		log.debug("saveMoneyConsume="+moneyConsume.getRemark());
 		persistenceManager.save(moneyConsume);
 		return "success";
 	}
@@ -51,7 +53,7 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 	@RemotingInclude
 	@Override
 	public String updateMoneyConsume(MoneyConsume moneyConsume) {
-		log.debug("updateMoneyConsume="+moneyConsume.getDescribe());
+		log.debug("updateMoneyConsume="+moneyConsume.getRemark());
 		persistenceManager.update(moneyConsume);
 		return "success";
 	}
@@ -83,7 +85,20 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 	public void setQueryManager(QueryManager queryManager) {
 		this.queryManager = queryManager;
 	}
-	
+
+	/**
+	 * 获取消费记录分页方式
+	 */
+	@Override
+	@RemotingInclude
+	public PageSupport getMoneyConsumePageSupport(List<QueryObject> valueObject, int pageNo,int pageSize) {
+		String sql = "from MoneyConsume t where 1=1";
+		if(null!=valueObject&&valueObject.size()>0){//带条件查询
+			sql = sql + " "+QueryObject.creatSql(valueObject);
+		}
+		sql = sql + " order by t.consumeDate";
+		return queryManager.find(sql, pageNo, pageSize);
+	}
 	
 
 }

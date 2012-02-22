@@ -156,4 +156,10 @@ public class PBUserServiceImpl implements PBUserService {
 		}
 	}
 
+	@Override
+	@RemotingInclude
+	public List<PBUser> getPBUserList() {
+		String hql = "from PBUser";
+		return queryManager.find(hql);
+	}
 }

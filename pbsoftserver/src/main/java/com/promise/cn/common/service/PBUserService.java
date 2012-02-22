@@ -54,4 +54,8 @@ public interface PBUserService {
 	 * 更新用户权限
 	 */
 	public String updateUserMenu(PBUser pbUser,List<Menu> listMenu);
+	/**
+	 * 返回所以用户，非分页模式
+	 */
+	public List<PBUser> getPBUserList();
 }

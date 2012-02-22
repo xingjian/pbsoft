@@ -4,6 +4,8 @@ package com.promise.cn.consume.service;
 import java.util.List;
 
 import com.promise.cn.consume.domain.MoneyConsume;
+import com.promise.cn.framework.support.PageSupport;
+import com.promise.cn.framework.support.QueryObject;
 
 /**   
  * @类名: MoneyConsumeService.java 
@@ -13,6 +15,7 @@ import com.promise.cn.consume.domain.MoneyConsume;
  * @日期: 2011-12-9 下午05:12:57 
  * @版本 V1.0   
  */
+@SuppressWarnings("all")
 public interface MoneyConsumeService {
 
 	/**
@@ -37,4 +40,12 @@ public interface MoneyConsumeService {
 	 * 通过personName来查询记录
 	 */
 	public List<MoneyConsume> getMoneyConsumeByUserID(String pbID);
+	/**
+	 * 获取分页消费记录
+	 * @param valueObject
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	public PageSupport getMoneyConsumePageSupport(List<QueryObject> valueObject,int pageNo,int pageSize);
 }
