@@ -8,7 +8,10 @@
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
+			
+			import mx.managers.PopUpManager;
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"名称",dataField:"name",width:'200'},
@@ -35,14 +38,38 @@
 				var uri:String = event.data.uri;
 				switch(uri){
 					case 'searchRecord':
+						searchRecord();
 						break;
 					case 'addRecord':
+						addRecord();
 						break;
 					case 'editRecord':
+						editRecord();
 						break;
 					case 'removeRecord':
 						break;
 				}
+			}
+			
+			//查询面板
+			public function searchRecord():void{
+				var searchPlan:SearchPlan = new SearchPlan();
+				PopUpManager.addPopUp(searchPlan,this,true);
+				Global.centerPopUpPos(searchPlan);
+			}
+			
+			//增加面板
+			public function addRecord():void{
+				var addPlan:AddPlan = new AddPlan();
+				PopUpManager.addPopUp(addPlan,this,true);
+				Global.centerPopUpPos(addPlan);
+			}
+			
+			//编辑面板
+			public function editRecord():void{
+				var editPlan:EditPlan = new EditPlan();
+				PopUpManager.addPopUp(editPlan,this,true);
+				Global.centerPopUpPos(editPlan);
 			}
 			
 			//刷新
