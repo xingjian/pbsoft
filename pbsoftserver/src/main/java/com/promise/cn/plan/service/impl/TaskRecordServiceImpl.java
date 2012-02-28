@@ -6,10 +6,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.flex.remoting.RemotingDestination;
+import org.springframework.flex.remoting.RemotingInclude;
 import org.springframework.stereotype.Service;
 
 import com.promise.cn.framework.service.PersistenceManager;
 import com.promise.cn.framework.service.QueryManager;
+import com.promise.cn.framework.support.PageSupport;
+import com.promise.cn.framework.support.QueryObject;
 import com.promise.cn.plan.domain.TaskRecord;
 import com.promise.cn.plan.domain.TaskRecordLog;
 import com.promise.cn.plan.service.TaskRecordService;
@@ -38,6 +41,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 增加任务
 	 */
 	@Override
+	@RemotingInclude
 	public String saveTaskRecord(TaskRecord taskRecord) {
 		log.debug("saveTaskRecord = "+taskRecord.getContent());
 		persistenceManager.save(taskRecord);
@@ -48,6 +52,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 修改任务
 	 */
 	@Override
+	@RemotingInclude
 	public String updateTaskRecord(TaskRecord taskRecord) {
 		log.debug("updateTaskRecord = "+taskRecord.getContent());
 		persistenceManager.update(taskRecord);
@@ -58,6 +63,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 删除任务
 	 */
 	@Override
+	@RemotingInclude
 	public String deleteTaskRecord(String id) {
 		log.debug("deleteTaskRecord id = "+id);
 		persistenceManager.remove(TaskRecord.class,id);
@@ -68,6 +74,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 获取所有任务
 	 */
 	@Override
+	@RemotingInclude
 	public List<TaskRecord> getAllTaskRecord() {
 		log.debug("getAllTaskRecord");
 		return (List<TaskRecord>)queryManager.findByNamedQuery("listAllTaskRecord");
@@ -77,6 +84,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 保存任务记录日志
 	 */
 	@Override
+	@RemotingInclude
 	public String saveTaskRecordLog(TaskRecordLog taskRecordLog) {
 		log.debug("saveTaskRecordLog = "+taskRecordLog.getRemark());
 		persistenceManager.save(taskRecordLog);
@@ -87,10 +95,24 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	 * 删除任务日志
 	 */
 	@Override
+	@RemotingInclude
 	public String deleteTaskRecordLog(String id) {
 		persistenceManager.remove(TaskRecordLog.class, id);
 		return null;
 	}
+	
+	@Override
+	@RemotingInclude
+	public PageSupport getTaskRecordPageSupport(List<QueryObject> valueObject,
+			int pageNo, int pageSize) {
+		String sql = "from TaskRecord t where 1=1";
+		if(null!=valueObject&&valueObject.size()>0){//带条件查询
+			sql = sql + " "+QueryObject.creatSql(valueObject);
+		}
+		sql = sql + " order by t.createDate";
+		return queryManager.find(sql, pageNo, pageSize);
+	}
+	
 	
 	public void setPersistenceManager(PersistenceManager persistenceManager) {
 		this.persistenceManager = persistenceManager;
@@ -99,5 +121,5 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	public void setQueryManager(QueryManager queryManager) {
 		this.queryManager = queryManager;
 	}
-	
+
 }

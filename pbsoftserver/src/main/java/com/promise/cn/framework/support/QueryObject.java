@@ -8,6 +8,7 @@ import java.util.List;
  * value 字段值
  * queryType  0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询 
  * **/
+@SuppressWarnings("all")
 public class QueryObject {
 
     private String key;

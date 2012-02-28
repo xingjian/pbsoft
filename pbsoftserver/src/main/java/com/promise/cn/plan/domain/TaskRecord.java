@@ -3,6 +3,8 @@ package com.promise.cn.plan.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,6 +29,7 @@ import com.promise.cn.common.domain.DictContent;
 @NamedQueries({
 	@NamedQuery(name="listTaskRecord",query="select t from TaskRecord t order by t.createDate asc")
 })
+@Entity
 @SuppressWarnings("all")
 @Table(name="taskrecord")
 public class TaskRecord implements Serializable {
@@ -39,7 +42,7 @@ public class TaskRecord implements Serializable {
 	
 	private String startDate;
 	
-	private String endData;
+	private String endDate;
 	
 	private String currentValue;
 	
@@ -50,6 +53,14 @@ public class TaskRecord implements Serializable {
 	private DictContent taskType;//任务类型
 	
 	private String activate;//1代表启动 0 代表未启动
+	
+	private String showTip;//是否提示0代表不提示，1代表提示
+	
+	private String pass;//是否完成0代表未完成，1代表完成
+	
+	private String activateDate;
+	
+	private String realEndDate;
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -57,7 +68,8 @@ public class TaskRecord implements Serializable {
 	public String getId() {
 		return id;
 	}
-
+	
+	@Basic
 	public String getStartDate() {
 		return startDate;
 	}
@@ -69,7 +81,7 @@ public class TaskRecord implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
+	@Basic
 	public String getName() {
 		return name;
 	}
@@ -77,7 +89,7 @@ public class TaskRecord implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	@Basic
 	public String getCreateDate() {
 		return createDate;
 	}
@@ -85,15 +97,15 @@ public class TaskRecord implements Serializable {
 	public void setCreateDate(String createDate) {
 		this.createDate = createDate;
 	}
-
-	public String getEndData() {
-		return endData;
+	@Basic
+	public String getEndDate() {
+		return endDate;
 	}
 
-	public void setEndData(String endData) {
-		this.endData = endData;
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
-
+	@Basic
 	public String getCurrentValue() {
 		return currentValue;
 	}
@@ -101,7 +113,7 @@ public class TaskRecord implements Serializable {
 	public void setCurrentValue(String currentValue) {
 		this.currentValue = currentValue;
 	}
-
+	@Basic
 	public String getCreateUser() {
 		return createUser;
 	}
@@ -109,7 +121,7 @@ public class TaskRecord implements Serializable {
 	public void setCreateUser(String createUser) {
 		this.createUser = createUser;
 	}
-
+	@Basic
 	public String getContent() {
 		return content;
 	}
@@ -127,7 +139,7 @@ public class TaskRecord implements Serializable {
 	public void setTaskType(DictContent taskType) {
 		this.taskType = taskType;
 	}
-
+	@Basic
 	public String getActivate() {
 		return activate;
 	}
@@ -135,5 +147,38 @@ public class TaskRecord implements Serializable {
 	public void setActivate(String activate) {
 		this.activate = activate;
 	}
+	@Basic
+	public String getShowTip() {
+		return showTip;
+	}
+
+	public void setShowTip(String showTip) {
+		this.showTip = showTip;
+	}
+
+	@Basic
+	public String getPass() {
+		return pass;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
 	
+	@Basic
+	public String getActivateDate() {
+		return activateDate;
+	}
+
+	public void setActivateDate(String activateDate) {
+		this.activateDate = activateDate;
+	}
+	
+	public String getRealEndDate() {
+		return realEndDate;
+	}
+
+	public void setRealEndDate(String realEndDate) {
+		this.realEndDate = realEndDate;
+	}
 }

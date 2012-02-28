@@ -3,6 +3,8 @@ package com.promise.cn.plan.service;
 
 import java.util.List;
 
+import com.promise.cn.framework.support.PageSupport;
+import com.promise.cn.framework.support.QueryObject;
 import com.promise.cn.plan.domain.TaskRecord;
 import com.promise.cn.plan.domain.TaskRecordLog;
 
@@ -39,6 +41,14 @@ public interface TaskRecordService {
 	 * @return
 	 */
 	public List<TaskRecord> getAllTaskRecord();
+	/**
+	 * 分页显示任务记录
+	 * @param valueObject
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	public PageSupport getTaskRecordPageSupport(List<QueryObject> valueObject, int pageNo,int pageSize);
 	/**
 	 * 增加一条记录日志
 	 * @param taskRecordLog
