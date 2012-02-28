@@ -11,11 +11,15 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
 			import com.promise.cn.plan.vo.TaskRecord;
 			
+			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
@@ -23,9 +27,27 @@
 			import mx.validators.Validator;
 			
 			private var taskRecordService:RemoteObject;
+			[Bindable]
+			private var planTypeCBData:ArrayCollection;
+			private var dictContentServiceSearch:RemoteObject;
+			
 			//初始化方法
 			public function init():void{
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
 				taskRecordService = Global.getRemoteObject("taskRecordService",taskRecordServiceHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.PLANTYPE);
+				//默认任务执行人员是系统登录用户
+				personNameText.text=Global.pbUser.name;
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				planTypeCBData = dictContentList;
+				//设置默认选择第一个
+				if(null!=planTypeCBData&&planTypeCBData.length>0){
+					planTypeCB.selectedIndex = 0;
+				}
 			}
 			
 			//保存成功
@@ -43,7 +65,17 @@
 			
 			//重置
 			public function resetBtnClick():void{
-			
+				nameText.text = "";
+				planTextArea.text = "";
+				radiogroup_active.selectedValue = "0";
+				radiogroup_show.selectedValue = "0";
+				startDF.selectedDate = new Date();
+				endDF.selectedDate = new Date();
+				personNameText.text = "";
+				//设置默认选择第一个
+				if(null!=planTypeCBData&&planTypeCBData.length>0){
+					planTypeCB.selectedIndex = 0;
+				}
 			}
 			//提交
 			public function submitBtnClick():void{
@@ -53,9 +85,18 @@
 					var taskRecord:TaskRecord = new TaskRecord();
 					taskRecord.name = nameText.text;
 					taskRecord.content = planTextArea.text;
-					//taskRecord.
-					var rb:RadioButton = radiogroup_active.selectedValue as RadioButton;
-					Alert.show(rb.label);
+					var active:String = radiogroup_active.selectedValue.toString();
+					var show:String = radiogroup_show.selectedValue.toString();
+					taskRecord.activate = active;
+					taskRecord.showTip = show;
+					taskRecord.startDate = startDF.text;
+					taskRecord.endDate = endDF.text;
+					taskRecord.pass = "0";
+					taskRecord.currentValue="0";
+					taskRecord.createUser = personNameText.text;
+					taskRecord.createDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+					taskRecord.taskType = planTypeCB.selectedItem as DictContent;
+					taskRecordService.saveTaskRecord(taskRecord);
 				}
 			}
 			
@@ -65,13 +106,13 @@
 	<s:Label x="19" y="10" height="22" text="计划名称：" verticalAlign="middle"/>
 	<s:TextInput id="nameText" x="87" y="10" width="313"/>
 	<s:Label x="19" y="40" width="60" height="23" text="开始时间：" verticalAlign="middle"/>
-	<mx:DateField id="startDF" x="87" y="40" width="120"/>
+	<mx:DateField id="startDF" x="87" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
 	<s:Label x="212" y="40" width="60" height="23" text="结束时间：" verticalAlign="middle"/>
-	<mx:DateField id="endDF" x="280" y="40" width="120"/>
+	<mx:DateField id="endDF" x="280" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
 	<s:Label x="19" y="71" height="22" text="执行人员：" verticalAlign="middle"/>
 	<s:TextInput id="personNameText" x="87" y="71" width="120"/>
 	<s:Label x="212" y="71" height="22" text="计划类型：" verticalAlign="middle"/>
-	<s:ComboBox id="planTypeCB" x="280" y="70" width="120"/>
+	<s:ComboBox id="planTypeCB" labelField="name" dataProvider="{planTypeCBData}" x="280" y="70" width="120"/>
 	<s:Label x="212" y="105" height="23" text="是否提示：" verticalAlign="middle"/>
 	<s:Label x="19" y="105" height="23" text="是否激活：" verticalAlign="middle"/>
 	<s:Label x="19" y="134" text="任务描述："/>
@@ -80,11 +121,11 @@
 	<s:Button x="168" y="236" label="重置" click="resetBtnClick()"/>
 	<s:Button x="280" y="236" label="关闭" click="closeWindow()"/>
 	<s:HGroup x="87" y="106" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
-		<s:RadioButton label="激活" groupName="radiogroup_active" selected="false"/>
-		<s:RadioButton label="不激活" groupName="radiogroup_active" selected="true"/>
+		<s:RadioButton label="激活" value="1" groupName="radiogroup_active" selected="false"/>
+		<s:RadioButton label="不激活" value="0" groupName="radiogroup_active" selected="true"/>
 	</s:HGroup>
 	<s:HGroup x="282" y="106" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
-		<s:RadioButton label="提示" groupName="radiogroup_show" selected="true"/>
-		<s:RadioButton label="不提示" groupName="radiogroup_show" selected="false"/>
+		<s:RadioButton label="提示" value="1" groupName="radiogroup_show" selected="true"/>
+		<s:RadioButton label="不提示" value="0" groupName="radiogroup_show" selected="false"/>
 	</s:HGroup>
 </s:TitleWindow>

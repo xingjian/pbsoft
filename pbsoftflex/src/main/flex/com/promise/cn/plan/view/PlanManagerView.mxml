@@ -10,27 +10,43 @@
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.plan.vo.TaskRecord;
 			
+			import mx.controls.Alert;
 			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.RemoteObject;
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"名称",dataField:"name",width:'200'},
-				{headerText:"创建时间",dataField:"createDate",width:'150'},
-				{headerText:"结束时间",dataField:"endDate",width:'150'},
+				{headerText:"开始时间",dataField:"startDate",width:'100'},
+				{headerText:"结束时间",dataField:"endDate",width:'100'},
 				{headerText:"当前进度",dataField:"currentValue",width:'80'},
 				{headerText:"创建人",dataField:"createUser",width:'80'},
-				{headerText:"任务类型",dataField:"taskType",width:'80'},
-				{headerText:"是否激活",dataField:"activate"}];
+				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
+				{headerText:"是否激活",dataField:"activateToString"},
+				{headerText:"激活时间",dataField:"activateDateToString"},
+				{headerText:"创建时间",dataField:"createDate",width:'150'},
+				];
 			
 			[Bindable]
 			private var linkButtons:Array = [{label:"查询",uri:"searchRecord",icon:Icons.searchIcon},
 				{label:"增加",uri:"addRecord",icon:Icons.addIcon},
 				{label:"修改",uri:"editRecord",icon:Icons.editIcon},
-				{label:"删除",uri:"removeRecord",icon:Icons.removeIcon}]
+				{label:"删除",uri:"removeRecord",icon:Icons.removeIcon},
+				{label:"激活",uri:"activeRecord",icon:Icons.removeIcon},
+				{label:"结束",uri:"passRecord",icon:Icons.removeIcon}
+				]
 			
+			private var taskRecordService:RemoteObject;
+			private var taskRecordServiceDelete:RemoteObject;
+				
 			//初始化方法
 			public function init():void{
-			
+				taskRecordService = Global.getRemoteObject("taskRecordService",taskRecordServiceHandle);
+				taskRecordServiceDelete = Global.getRemoteObject("taskRecordService",taskRecordServiceDeleteHandle);
+				taskRecordService.getTaskRecordPageSupport(null,1,20);
 			}
 			
 			//linkBarClick事件
@@ -47,6 +63,7 @@
 						editRecord();
 						break;
 					case 'removeRecord':
+						removeRecord();
 						break;
 				}
 			}
@@ -61,19 +78,50 @@
 			//增加面板
 			public function addRecord():void{
 				var addPlan:AddPlan = new AddPlan();
+				addPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addTaskRecordSuccess);
 				PopUpManager.addPopUp(addPlan,this,true);
 				Global.centerPopUpPos(addPlan);
 			}
 			
+			//removeMoneyConsume
+			public function removeRecord():void{
+				if(null!=pageGrid.selectedItem){
+					taskRecordServiceDelete.deleteTaskRecord(pageGrid.selectedItem.id);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			public function taskRecordServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("消费任务删除成功！","系统提示");
+			}
+			
+			public function addTaskRecordSuccess(event:AppEvent):void{
+				refresh(event);
+			}
+			
 			//编辑面板
 			public function editRecord():void{
-				var editPlan:EditPlan = new EditPlan();
-				PopUpManager.addPopUp(editPlan,this,true);
-				Global.centerPopUpPos(editPlan);
+				if(null!=pageGrid.selectedItem){
+					var editPlan:EditPlan = new EditPlan();
+					editPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addTaskRecordSuccess);
+					editPlan.taskRecord = pageGrid.selectedItem as TaskRecord;
+					PopUpManager.addPopUp(editPlan,this,true);
+					Global.centerPopUpPos(editPlan);
+				}else{
+					Alert.show("请选择一条任务记录进行修改！","系统提示");
+				}
+			}
+			
+			//查询任务记录成功
+			public function taskRecordServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
 			}
 			
 			//刷新
 			public function refresh(event:AppEvent):void{
+				taskRecordService.getTaskRecordPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
 			}
 			
 		]]>

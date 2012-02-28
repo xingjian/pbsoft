@@ -10,5 +10,6 @@ package com.promise.cn.common
 	public class DictConstant
 	{
 		public static const CONSUMETYPE:String = "consumeType";//消费类型
+		public static const PLANTYPE:String = "planType";
 	}
 }
