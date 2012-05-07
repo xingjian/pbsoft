@@ -25,5 +25,6 @@ package com.promise.cn.framework.util
 		public static const APP_MONEYCONSUMETITLEWINDOW:String = "freshMoneyConsume";
 		public static const APP_MONEYCONSUMESEARCH:String = "appMoneySumeSearch";
 		public static const APP_PLANTITLEWINDOW:String = "freshPlan";
+		public static const APP_PLANSEARCH:String = "appPlanSearch";
 	}
 }

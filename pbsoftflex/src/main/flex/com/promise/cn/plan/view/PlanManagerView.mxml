@@ -7,27 +7,28 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.promise.cn.common.renderer.ProgressBarItemRenderer;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
 			import com.promise.cn.plan.vo.TaskRecord;
 			
 			import mx.controls.Alert;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
-			import mx.rpc.remoting.RemoteObject;
+			import mx.rpc.remoting.mxml.RemoteObject;
 			
 			[Bindable]
-			public var header:Array =  [{headerText:"名称",dataField:"name",width:'200'},
+			public var header:Array =  [{headerText:"名称",dataField:"name",width:'150'},
 				{headerText:"开始时间",dataField:"startDate",width:'100'},
 				{headerText:"结束时间",dataField:"endDate",width:'100'},
-				{headerText:"当前进度",dataField:"currentValue",width:'80'},
+				{headerText:"当前进度",dataField:"currentValue",width:'180',itemRenderer:new ClassFactory(ProgressBarItemRenderer)},
 				{headerText:"创建人",dataField:"createUser",width:'80'},
 				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
 				{headerText:"是否激活",dataField:"activateToString"},
-				{headerText:"激活时间",dataField:"activateDateToString"},
-				{headerText:"创建时间",dataField:"createDate",width:'150'},
+				{headerText:"激活时间",dataField:"activateDateToString"}
 				];
 			
 			[Bindable]
@@ -35,18 +36,21 @@
 				{label:"增加",uri:"addRecord",icon:Icons.addIcon},
 				{label:"修改",uri:"editRecord",icon:Icons.editIcon},
 				{label:"删除",uri:"removeRecord",icon:Icons.removeIcon},
-				{label:"激活",uri:"activeRecord",icon:Icons.removeIcon},
-				{label:"结束",uri:"passRecord",icon:Icons.removeIcon}
+				{label:"激活任务",uri:"activeRecord",icon:Icons.planactive},
+				{label:"结束任务",uri:"passRecord",icon:Icons.planend},
+				{label:"添加任务日志",uri:"append",icon:Icons.planappend}
 				]
 			
 			private var taskRecordService:RemoteObject;
 			private var taskRecordServiceDelete:RemoteObject;
+			private var taskRecordServiceUpdate:RemoteObject
 				
 			//初始化方法
 			public function init():void{
 				taskRecordService = Global.getRemoteObject("taskRecordService",taskRecordServiceHandle);
 				taskRecordServiceDelete = Global.getRemoteObject("taskRecordService",taskRecordServiceDeleteHandle);
 				taskRecordService.getTaskRecordPageSupport(null,1,20);
+				taskRecordServiceUpdate = Global.getRemoteObject("taskRecordService",taskRecordServiceUpdateHandle);
 			}
 			
 			//linkBarClick事件
@@ -65,14 +69,70 @@
 					case 'removeRecord':
 						removeRecord();
 						break;
+					case 'activeRecord':
+						activeRecord();
+						break;
+					case 'passRecord':
+						passRecord();
+						break;
+					case 'append':
+						appendRecord();
+						break;
 				}
+			}
+			
+			//添加任务记录
+			public function appendRecord():void{
+				if(null!=pageGrid.selectedItem){
+					var tr:TaskRecord = pageGrid.selectedItem as TaskRecord;
+					var addPlanLog:AddPlanLog = new AddPlanLog();
+					addPlanLog.taskRecord = tr;
+					PopUpManager.addPopUp(addPlanLog,this,true);
+					Global.centerPopUpPos(addPlanLog);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			//激活
+			public function activeRecord():void{
+				if(null!=pageGrid.selectedItem){
+					var tr:TaskRecord = pageGrid.selectedItem as TaskRecord;
+					tr.activate = "1";
+					tr.activateDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+					taskRecordServiceUpdate.updateTaskRecord(tr);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			//结束
+			public function passRecord():void{
+				if(null!=pageGrid.selectedItem){
+					var trpass:TaskRecord = pageGrid.selectedItem as TaskRecord;
+					trpass.pass = "1";
+					trpass.endDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+					taskRecordServiceUpdate.updateTaskRecord(trpass);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			//修改成功
+			public function taskRecordServiceUpdateHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("任务更新成功！","系统提示");
 			}
 			
 			//查询面板
 			public function searchRecord():void{
 				var searchPlan:SearchPlan = new SearchPlan();
+				searchPlan.addEventListener(PBConstant.APP_PLANSEARCH,searchSuccessHandle);
 				PopUpManager.addPopUp(searchPlan,this,true);
 				Global.centerPopUpPos(searchPlan);
+			}
+			//查询成功
+			public function searchSuccessHandle(event:AppEvent):void{
+				pageGrid.setList(event.data);
 			}
 			
 			//增加面板

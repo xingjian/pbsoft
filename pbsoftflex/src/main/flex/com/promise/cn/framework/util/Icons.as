@@ -28,9 +28,15 @@ public class Icons
 	[Embed(source="../../../../../com/promise/cn/images/moneyconsumemanager.png")]
 	public static const moneyconsume:Class;//日常消费
 	[Embed(source="../../../../../com/promise/cn/images/dictmanager.png")]
-	public static const dict:Class;
+	public static const dict:Class;//字典管理
 	[Embed(source="../../../../../com/promise/cn/images/save-icon.png")]
-	public static const saveIcon:Class;
+	public static const saveIcon:Class;//保存按钮
+	[Embed(source="../../../../../com/promise/cn/images/planend.png")]
+	public static const planend:Class;//计划结束
+	[Embed(source="../../../../../com/promise/cn/images/planactive.png")]
+	public static const planactive:Class;//计划激活
+	[Embed(source="../../../../../com/promise/cn/images/planappend.gif")]
+	public static const planappend:Class;//计划激活
 	
 	public function Icons()
 	{

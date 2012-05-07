@@ -10,10 +10,12 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.promise.cn.common.renderer.ProgressBarItemRenderer;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.PBConstant;
 			
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			
 			[Bindable]
@@ -58,6 +60,9 @@
 					col.dataField = obj.dataField;
 					if(obj.width != undefined){
 						col.width = obj.width;
+					}
+					if(obj.itemRenderer != undefined){
+						col.itemRenderer = obj.itemRenderer;
 					}
 					this.columns.push(col);
 				}
