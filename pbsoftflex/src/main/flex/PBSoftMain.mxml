@@ -10,14 +10,18 @@
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.framework.util.UIStyleManager;
+			import com.promise.cn.skins.ApplicationSkin;
 			
 			public var uiStyleManager:UIStyleManager;
 			
 			//初始化方法
 			public function init():void{
 				uiStyleManager = new UIStyleManager();
+				var skin:ApplicationSkin = this.skin as ApplicationSkin;
+				skin.setBorderBackground(Global.backgroundImage);
 				AppEvent.dispatch(PBConstant.APP_CREATECOMPLETE);
 			}
 		]]>

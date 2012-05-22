@@ -5,4 +5,5 @@
 s|Application{
 	modalTransparencyBlur: 0;/* 模糊度*/
 	modalTransparency: 0; /* 透明度*/
+	skinClass:ClassReference("com.promise.cn.skins.ApplicationSkin");/*设置皮肤类*/
 }

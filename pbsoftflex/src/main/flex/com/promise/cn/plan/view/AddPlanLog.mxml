@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" title="增加计划任务日志"
+			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow(event)" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="386" height="260">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.redBar{
+			bar-color:#00ff00;			
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.plan.vo.TaskRecord;
+			import com.promise.cn.plan.vo.TaskRecordLog;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var taskRecord:TaskRecord;
+			public var taskRecordService:RemoteObject;
+			
+			public function init():void{
+				taskRecordService = Global.getRemoteObject("taskRecordService",taskRcordServiceHandle);
+				ns.value = Number(taskRecord.currentValue);
+				pb.setProgress(Number(taskRecord.currentValue),100);
+				pb.label = "当前进度: "+ns.value+"%";
+			}
+			
+			//保存成功
+			public function taskRcordServiceHandle(event:ResultEvent):void{
+				Alert.show("任务记录添加成功，请努力加油","系统提示");
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//修改
+			protected function ns_changeHandler(event:Event):void{
+				pb.setProgress(ns.value,100);
+				pb.label = "当前进度: "+ns.value+"%";
+			}
+			
+			//增加日志
+			protected function btnCommitHandle(event:MouseEvent):void{
+				var taskLog:TaskRecordLog = new TaskRecordLog();
+				taskLog.createDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+				taskLog.remark = remarkText.text;
+				taskLog.value = String(pb.value);
+				taskLog.taskRecord = this.taskRecord;
+				taskRecordService.saveTaskRecordLog(taskLog);
+			}
+			
+			//重置按钮
+			protected function resetBtnClickHandle(event:MouseEvent):void{
+				remarkText.text = "";
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label x="27" y="20" text="任务名称："/>
+	<s:TextInput id="taskNameText" x="92" y="19" width="275" text="{taskRecord.name}" editable="false"/>
+	<s:Label x="27" y="64" text="任务进度："/>
+	<mx:ProgressBar id="pb" x="92" y="59" labelPlacement="center" mode="manual" barSkin="com.promise.cn.common.skin.ProgressBarSkin" styleName="redBar" color="#0000FF"/>
+	<s:NumericStepper id="ns" x="313" y="56" width="54" maximum="100" change="ns_changeHandler(event)"/>
+	<s:Label x="27" y="92" text="任务记录："/>
+	<s:TextArea id="remarkText" x="27" y="112" width="340" height="66"/>
+	<s:Button x="50" y="196" label="提交" click="btnCommitHandle(event)"/>
+	<s:Button x="160" y="196" label="重置" click="resetBtnClickHandle(event)"/>
+	<s:Button x="271" y="196" label="关闭" click="closeWindow(event)"/>
+</s:TitleWindow>
