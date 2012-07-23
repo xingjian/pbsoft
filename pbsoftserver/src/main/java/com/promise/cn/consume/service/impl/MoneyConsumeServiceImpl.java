@@ -79,14 +79,6 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 		return queryManager.findByNamedQuery("listMoneyConsumeByUserID", pbID);
 	}
 
-	public void setPersistenceManager(PersistenceManager persistenceManager) {
-		this.persistenceManager = persistenceManager;
-	}
-
-	public void setQueryManager(QueryManager queryManager) {
-		this.queryManager = queryManager;
-	}
-
 	/**
 	 * 获取消费记录分页方式
 	 */
@@ -101,5 +93,11 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 		return queryManager.find(sql, pageNo, pageSize);
 	}
 	
+	public void setPersistenceManager(PersistenceManager persistenceManager) {
+		this.persistenceManager = persistenceManager;
+	}
 
+	public void setQueryManager(QueryManager queryManager) {
+		this.queryManager = queryManager;
+	}
 }

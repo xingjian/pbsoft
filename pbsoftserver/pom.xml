@@ -40,13 +40,12 @@
 		    <groupId>org.slf4j</groupId>  
 		    <artifactId>slf4j-api</artifactId>  
 		    <version>1.6.4</version>  
-		</dependency> 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.12</version>
-			<scope>compile</scope>
 		</dependency>
+		<dependency>  
+		    <groupId>org.slf4j</groupId>  
+		    <artifactId>slf4j-nop</artifactId>  
+		    <version>1.6.4</version>  
+		</dependency> 
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
@@ -114,9 +113,9 @@
 			<classifier>jdk15</classifier>
 		</dependency>
 		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-			<version>4</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>jdbc</artifactId>
+			<version>3.1.14</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -141,19 +140,6 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
