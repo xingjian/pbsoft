@@ -2,45 +2,122 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.common.view.*">
 	<fx:Declarations>
+		<s:Fade id="fade" target="{login}" alphaFrom="1" alphaTo="0" duration="1500" effectEnd="fade_effectEndHandler(event)"   />
+		<s:Fade id="fade1" target="{mainLoginSuccessView}"  alphaFrom="0" alphaTo="1" duration="1500" />
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
 			import com.adobe.ac.mxeffects.CubeRotate;
 			import com.adobe.ac.mxeffects.DistortionConstants;
-			import com.adobe.ac.mxeffects.Flip;
-			import com.adobe.ac.mxeffects.Gate;
 			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.ControlManageServer;
+			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.moneyconsume.view.MoneyConsumeManagerView;
+			import com.promise.cn.plan.view.PlanManagerView;
 			
 			import mx.controls.Alert;
+			import mx.core.IVisualElement;
+			import mx.events.EffectEvent;
+			import mx.managers.PopUpManager;
 			
+			[Bindable]
+			public var login:MainView_LoginView;
+			[Bindable]
+			public var cms:ControlManageServer = new ControlManageServer();
+			public var currentNC:NavigatorContent;
+			public var cubeRotate : CubeRotate;
 			//初始化方法
 			private function init():void{
 				AppEvent.addListener(PBConstant.APP_LOGINSUCCESS,loginSuccessEventHandler);
+				login = new MainView_LoginView();
+				PopUpManager.addPopUp(login,this,true);
+				Global.centerPopUpPos(login);
+				currentNC = mainLoginSuccessViewNC;
 			}
 			
 			//登录成功
 			protected function loginSuccessEventHandler(event:AppEvent):void{
-				var e : Gate = new Gate(mainLoginViewNC);
-				e.siblings = [mainLoginSuccessViewNC];
-				e.direction = DistortionConstants.LEFT;
-				e.verticalLightingLocation = DistortionConstants.RIGHT;
-				e.duration = 2000;
-				e.play();
+				fade.play();
 			}
 			
 			//登录失败
 			protected function loginFailureEventHandler(event:AppEvent):void{
 			}
+			
+			protected function fade_effectEndHandler(event:EffectEvent):void{
+				PopUpManager.removePopUp(login);
+				fade1.play();
+				cms.registerMessageHandleObject(mainLoginSuccessViewNC,"mainLoginSuccessViewNC");
+			}
+			
+			public function returnMainViewDC():void{
+				if(currentNC!=mainLoginSuccessViewNC){
+					navigationFromTo(currentNC,mainLoginSuccessViewNC,DistortionConstants.RIGHT);
+				}
+			}
+			//通过url返回组件
+			public function getIVisualElementByName(url:String):IVisualElement{
+				if(url=="menuManager"){
+					return new MenuManagerView();
+				}else if(url=="userManager"){
+					return new UserManagerView();
+				}else if(url=="planManager"){
+					return new PlanManagerView();
+				}else if(url=="moneyconsumeManager"){
+					return new MoneyConsumeManagerView();
+				}else if(url=="dictManager"){
+					return new DictManagerView();
+				}else{
+					return null;
+				}
+			}
+			
+			//更换右边面板
+			private function tileClick(event:AppEvent):void{
+				var url:String  = event.data as String;
+				var ncTemp:NavigatorContent = null;
+				ncTemp = cms.getIVisualElementByName(url);
+				if(null==ncTemp){
+					ncTemp = new NavigatorContent();
+					ncTemp.percentHeight=100;
+					ncTemp.percentWidth=100;
+					ncTemp.addElement(getIVisualElementByName(url));
+					mainViewStack.addElement(ncTemp);
+					cms.registerMessageHandleObject(ncTemp,url);
+					navigationFromTo(currentNC,ncTemp);
+				}else{
+					navigationFromTo(currentNC,ncTemp,DistortionConstants.RIGHT);
+				}
+			}
+			
+			public function navigationFromTo(fromNC:NavigatorContent,toNC:NavigatorContent,direction:String = DistortionConstants.LEFT):void{
+				var isPlay:Boolean = false;
+				if(mainViewStack.selectedChild!=noNC){//解决初始化背景老是出现图表
+					mainViewStack.selectedChild = noNC;
+				}
+				if(null!=cubeRotate){
+					isPlay = cubeRotate.isPlaying;
+				}
+				if(!isPlay){//解决多个特效同时
+					cubeRotate = new CubeRotate(fromNC);
+					cubeRotate.siblings = [toNC];
+					cubeRotate.direction = direction;
+					cubeRotate.horizontalLightingLocation = DistortionConstants.LEFT;
+					cubeRotate.duration = 2000;
+					cubeRotate.play();
+					currentNC = toNC;
+				}
+				
+			}
 		]]>
 	</fx:Script>
 	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
-		<mx:ViewStack id="loginViewStack" width="100%" height="100%" creationPolicy="all">
-			<s:NavigatorContent id="mainLoginViewNC" width="100%" height="100%">
-				<view:MainView_LoginView id="mainLoginView" />
-			</s:NavigatorContent>
+		<mx:ViewStack id="mainViewStack"  width="100%" height="100%">
 			<s:NavigatorContent id="mainLoginSuccessViewNC" width="100%" height="100%">
-				<view:MainView_LoginSuccessView id="mainLoginSuccessView" />
+					<view:MainView_LoginSuccessView id="mainLoginSuccessView"  visible="false" navigationListChange="tileClick(event)" />
+			</s:NavigatorContent>
+			<s:NavigatorContent id="noNC" width="100%" height="100%">
 			</s:NavigatorContent>
 		</mx:ViewStack>
 	</s:VGroup>

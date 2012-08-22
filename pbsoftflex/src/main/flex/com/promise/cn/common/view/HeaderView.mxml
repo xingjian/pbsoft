@@ -5,6 +5,22 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name="mainViewDC",type="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		
+		.label{
+			color:#FE8B19;
+			fontSize:14
+		}
+		.linkbutton{
+			fontFamily:"微软雅黑";
+			fontWeight:bold;
+		}
+	</fx:Style>
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.common.vo.PBUser;
@@ -29,11 +45,23 @@
 				pbUser = Global.pbUser;
 				var userInfoLabel:Label = new Label();
 				userInfoLabel.text = '欢迎 '+pbUser.name+' 登录PBSoft!';
+				userInfoLabel.styleName ="label";
 				userInfoHG.addElement(userInfoLabel);
+				var mainViewLB:LinkButton = new LinkButton();
+				mainViewLB.label = "主页面";
+				mainViewLB.styleName = "linkbutton";
+				mainViewLB.addEventListener(MouseEvent.CLICK,mainViewLBClick);
+				userInfoHG.addElement(mainViewLB);
 				var exitBtn:LinkButton = new LinkButton();
 				exitBtn.label = "退出系统";
+				exitBtn.styleName = "linkbutton";
 				exitBtn.addEventListener(MouseEvent.CLICK,exitSystem);
 				userInfoHG.addElement(exitBtn);
+			}
+			
+			//主页面
+			public function mainViewLBClick(event:MouseEvent):void{
+				this.dispatchEvent(new AppEvent("mainViewDC","mainViewDC"));
 			}
 			
 			//退出登录

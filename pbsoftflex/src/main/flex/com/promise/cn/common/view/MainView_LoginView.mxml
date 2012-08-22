@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.common.view.*">
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="250" xmlns:view="com.promise.cn.common.view.*" borderVisible="false"
+		 skinClass="com.promise.cn.skins.TitleWindowNoHeaderSkin">
 	<fx:Declarations>
 	</fx:Declarations>
 	<fx:Script>
@@ -46,11 +47,13 @@
 			}
 		]]>
 	</fx:Script>
+	<!--
 	<s:Rect width="100%" height="100%" alpha="1.0">
 		<s:fill>
 			<s:SolidColor color="#666666"/>
 		</s:fill>
 	</s:Rect>
+	-->
 	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
 		<mx:ViewStack id="loginViewStack" creationPolicy="all">
 			<s:NavigatorContent id="loginViewNC" width="400" height="250">
@@ -61,4 +64,4 @@
 			</s:NavigatorContent>
 		</mx:ViewStack>
 	</s:VGroup>
-</s:Group>
+</s:TitleWindow>

@@ -73,6 +73,7 @@
 			//设置验证码
 			public function setCheckCode():void{
 				checkCodeLabel.text = PBUtil.GenerateCheckCode();
+				checkCodeTF.text = checkCodeLabel.text;
 			}
 		]]>
 	</fx:Script>

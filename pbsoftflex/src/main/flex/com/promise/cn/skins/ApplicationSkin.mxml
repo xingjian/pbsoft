@@ -28,7 +28,7 @@
   </s:Rect> 
   <s:Rect id="background" left="0" top="0" right="0" bottom="0" alpha="5.0"> 
     <s:fill>
-      <s:BitmapFill id="bgImage" fillMode="{mx.graphics.BitmapFillMode.SCALE}"/>
+      <s:BitmapFill id="bgImage" fillMode="{mx.graphics.BitmapFillMode.REPEAT}"/>
     </s:fill>
   </s:Rect> 
   <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0"> 

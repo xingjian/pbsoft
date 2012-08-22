@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"  creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" useHandCursor="false" buttonMode="true"
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="130">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.PBConstant;
+			
+			import mx.controls.Alert;
+			[Bindable]
+			public var labelStr:String = "";
+			[Bindable]
+			public var iconClass:Class = null;
+			[Bindable]
+			public var uri:String = "";
+			//初始化方法
+			public function init():void{
+			}
+			
+			public function clickHandle(event:MouseEvent):void{
+				this.dispatchEvent(new AppEvent(PBConstant.APP_ICONLABEL_CLICK,uri));
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Image source="{iconClass}" click="clickHandle(event)" />
+	<s:Label text="{labelStr}" click="clickHandle(event)" />
+</s:VGroup>
