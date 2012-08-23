@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*">
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -16,6 +16,8 @@
 			import com.promise.cn.plan.vo.TaskRecord;
 			
 			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.mxml.RemoteObject;
@@ -32,8 +34,7 @@
 				];
 			
 			[Bindable]
-			private var linkButtons:Array = [{label:"查询",uri:"searchRecord",icon:Icons.searchIcon},
-				{label:"增加",uri:"addRecord",icon:Icons.addIcon},
+			private var linkButtons:Array = [{label:"增加",uri:"addRecord",icon:Icons.addIcon},
 				{label:"修改",uri:"editRecord",icon:Icons.editIcon},
 				{label:"删除",uri:"removeRecord",icon:Icons.removeIcon},
 				{label:"激活任务",uri:"activeRecord",icon:Icons.planactive},
@@ -57,9 +58,6 @@
 			public function linkBarClick(event:AppEvent):void{
 				var uri:String = event.data.uri;
 				switch(uri){
-					case 'searchRecord':
-						searchRecord();
-						break;
 					case 'addRecord':
 						addRecord();
 						break;
@@ -146,15 +144,21 @@
 			//removeMoneyConsume
 			public function removeRecord():void{
 				if(null!=pageGrid.selectedItem){
-					taskRecordServiceDelete.deleteTaskRecord(pageGrid.selectedItem.id);
+					Alert.show("确定要删除该信息吗？","系统提示",3,null,delHandler,null,Alert.NO);
 				}else{
 					Alert.show("请选择一条任务记录！","系统提示");
 				}
 			}
 			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					taskRecordServiceDelete.deleteTaskRecord(pageGrid.selectedItem.id);
+				}
+			}
+			
 			public function taskRecordServiceDeleteHandle(event:ResultEvent):void{
 				refresh(null);
-				Alert.show("消费任务删除成功！","系统提示");
+				Alert.show("任务计划删除成功！","系统提示");
 			}
 			
 			public function addTaskRecordSuccess(event:AppEvent):void{
@@ -184,8 +188,17 @@
 				taskRecordService.getTaskRecordPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
 			}
 			
+			protected function pbt_enterHandler(event:FlexEvent):void
+			{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+			}
+			
 		]]>
 	</fx:Script>
-	<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+	<s:HGroup width="100%"  verticalAlign="middle">
+		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" />
+		<s:Spacer width="10" />
+	</s:HGroup>
 	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
 </s:VGroup>

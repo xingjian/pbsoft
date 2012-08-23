@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" title="增加计划任务日志"
-			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow(event)" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="386" height="260">
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" title="增加计划任务日志"
+			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow(event)" titleIcon="{Icons.addIcon}"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="386" height="260" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 	</fx:Declarations>
 	<fx:Style>
@@ -14,6 +14,7 @@
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBUtil;
 			import com.promise.cn.plan.vo.TaskRecord;
 			import com.promise.cn.plan.vo.TaskRecordLog;
@@ -77,4 +78,4 @@
 	<s:Button x="50" y="196" label="提交" click="btnCommitHandle(event)"/>
 	<s:Button x="160" y="196" label="重置" click="resetBtnClickHandle(event)"/>
 	<s:Button x="271" y="196" label="关闭" click="closeWindow(event)"/>
-</s:TitleWindow>
+</views:PBTitleWindow>

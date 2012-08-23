@@ -93,7 +93,7 @@
 			
 			public function navigationFromTo(fromNC:NavigatorContent,toNC:NavigatorContent,direction:String = DistortionConstants.LEFT):void{
 				var isPlay:Boolean = false;
-				if(mainViewStack.selectedChild!=noNC){//解决初始化背景老是出现图表
+				if(mainViewStack.selectedChild!=noNC){//解决初始化背景老是出现第一个页面背景
 					mainViewStack.selectedChild = noNC;
 				}
 				if(null!=cubeRotate){

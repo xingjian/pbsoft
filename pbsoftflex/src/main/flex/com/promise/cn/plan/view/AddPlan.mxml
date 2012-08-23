@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
-			   xmlns:s="library://ns.adobe.com/flex/spark" title="增加新的任务计划" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="412" height="300">
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" title="增加新的任务计划" titleIcon="{Icons.addIcon}"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="412" height="300" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<s:RadioButtonGroup id="radiogroup_active"/>
 		<s:RadioButtonGroup id="radiogroup_show"/>
@@ -15,6 +15,7 @@
 			import com.promise.cn.common.vo.DictContent;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.framework.util.PBUtil;
 			import com.promise.cn.plan.vo.TaskRecord;
@@ -120,12 +121,12 @@
 	<s:Button id="saveBtn" x="55" y="236" label="提交" click="submitBtnClick()"/>
 	<s:Button x="168" y="236" label="重置" click="resetBtnClick()"/>
 	<s:Button x="280" y="236" label="关闭" click="closeWindow()"/>
-	<s:HGroup x="87" y="106" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
+	<s:HGroup x="87" y="105" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
 		<s:RadioButton label="激活" value="1" groupName="radiogroup_active" selected="false"/>
 		<s:RadioButton label="不激活" value="0" groupName="radiogroup_active" selected="true"/>
 	</s:HGroup>
-	<s:HGroup x="282" y="106" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
+	<s:HGroup x="282" y="104" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
 		<s:RadioButton label="提示" value="1" groupName="radiogroup_show" selected="true"/>
 		<s:RadioButton label="不提示" value="0" groupName="radiogroup_show" selected="false"/>
 	</s:HGroup>
-</s:TitleWindow>
+</views:PBTitleWindow>
