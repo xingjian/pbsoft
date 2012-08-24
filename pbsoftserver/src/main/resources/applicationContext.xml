@@ -31,6 +31,7 @@
 				<value>com.promise.cn.common.domain.DictContent</value>
 				<value>com.promise.cn.consume.domain.MoneyConsume</value>
 				<value>com.promise.cn.plan.domain.TaskRecord</value>
+				<value>com.promise.cn.plan.domain.TaskRecordLog</value>
 				<value>com.promise.cn.memorandum.domain.Memorandum</value>
 				<value>com.promise.cn.common.domain.Menu</value>
 			</list>

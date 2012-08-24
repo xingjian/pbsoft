@@ -88,6 +88,8 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	public String saveTaskRecordLog(TaskRecordLog taskRecordLog) {
 		log.debug("saveTaskRecordLog = "+taskRecordLog.getRemark());
 		persistenceManager.save(taskRecordLog);
+		taskRecordLog.getTaskRecord().setCurrentValue(taskRecordLog.getValue());
+		persistenceManager.update(taskRecordLog.getTaskRecord());
 		return "success";
 	}
 

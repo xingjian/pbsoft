@@ -3,6 +3,7 @@ package com.promise.cn.plan.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,6 +25,7 @@ import com.promise.cn.common.domain.DictContent;
  * @版本 V1.0   
  */
 @SuppressWarnings("all")
+@Entity
 @Table(name="taskrecordlog")
 public class TaskRecordLog implements Serializable {
 
@@ -39,7 +41,7 @@ public class TaskRecordLog implements Serializable {
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GenericGenerator(name="system-uuid",strategy="uuid")
 	public String getId() {
 		return id;
 	}
@@ -48,7 +50,7 @@ public class TaskRecordLog implements Serializable {
 		this.id = id;
 	}
 
-	@OneToMany(targetEntity=DictContent.class,fetch=FetchType.EAGER)
+	@ManyToOne(targetEntity=TaskRecord.class,fetch=FetchType.EAGER)
     @JoinColumn(name="taskrecordid")
 	public TaskRecord getTaskRecord() {
 		return taskRecord;

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.flex.remoting.RemotingExclude;
 
-import com.promise.cn.consume.service.impl.MoneyConsumeServiceImpl;
 import com.promise.cn.framework.service.PersistenceManager;
 import com.promise.cn.framework.service.QueryManager;
 import com.promise.cn.framework.support.PageSupport;
@@ -23,6 +22,7 @@ import com.promise.cn.photo.service.PhotoService;
  * @日期： 2012-5-23 下午06:39:18 
  * @版本： V1.0   
  */
+@SuppressWarnings("all")
 public class PhotoServiceImpl implements PhotoService {
 
 	//日志对象
