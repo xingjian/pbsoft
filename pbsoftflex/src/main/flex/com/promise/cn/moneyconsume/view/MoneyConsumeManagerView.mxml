@@ -14,6 +14,7 @@
 			import com.promise.cn.moneyconsume.vo.MoneyConsume;
 			
 			import mx.controls.Alert;
+			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.mxml.RemoteObject;
@@ -110,9 +111,15 @@
 			//removeMoneyConsume
 			public function removeMoneyConsume():void{
 				if(null!=pageGrid.selectedItem){
-					moneyConsumeServiceDelete.deleteMoneyConsume(pageGrid.selectedItem.id);
+					Alert.show("确定要删除该消费记录？","系统提示",3,null,delHandler,null,Alert.NO);
 				}else{
 					Alert.show("请选择一条消费记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail == Alert.YES){
+					moneyConsumeServiceDelete.deleteMoneyConsume(pageGrid.selectedItem.id);
 				}
 			}
 			

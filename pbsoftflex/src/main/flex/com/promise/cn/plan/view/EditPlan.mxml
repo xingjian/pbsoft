@@ -87,6 +87,11 @@
 					var active:String = radiogroup_active.selectedValue.toString();
 					var show:String = radiogroup_show.selectedValue.toString();
 					taskRecord.activate = active;
+					if(active=="1"){
+						taskRecord.activateDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+					}else{
+						taskRecord.activateDate = "";
+					}
 					taskRecord.showTip = show;
 					taskRecord.startDate = startDF.text;
 					taskRecord.endDate = endDF.text;

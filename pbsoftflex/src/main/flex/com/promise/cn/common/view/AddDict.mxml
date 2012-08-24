@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="增加字典" close="closeWindow()"
-		 xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="init()"
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="324" height="172">
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="增加字典" close="closeWindow()"
+		 xmlns:s="library://ns.adobe.com/flex/spark" creationComplete="init()" titleIcon="{Icons.addIcon}"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="324" height="172" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -12,6 +12,7 @@
 		<![CDATA[
 			import com.promise.cn.common.vo.Dict;
 			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Icons;
 			
 			import mx.controls.Alert;
 			import mx.managers.PopUpManager;
@@ -54,4 +55,4 @@
 	<s:Button x="39" y="105" label="保存" click="saveBtnClick()"/>
 	<s:Button x="129" y="105" label="重置" click="resetBtnClick()"/>
 	<s:Button x="217" y="105" label="关闭" click="closeWindow()"/>
-</s:TitleWindow>
+</views:PBTitleWindow>

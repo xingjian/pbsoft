@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="查询消费记录" creationComplete="init()"
-			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow()" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="452" height="252">
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="查询消费记录" creationComplete="init()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow()" titleIcon="{Icons.searchIcon}" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="452" height="252" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -12,6 +12,7 @@
 			import com.promise.cn.common.vo.PBUser;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.framework.vo.QueryObject;
 			
@@ -132,4 +133,4 @@
 	<s:Button id="searchBtn" x="100" y="188" label="查询" click="searchBtnClick()"/>
 	<s:Button x="288" y="188" label="关闭" click="closeWindow()"/>
 	<s:Button x="195" y="188" label="重置" click="resetBtnClick()"/>
-</s:TitleWindow>
+</views:PBTitleWindow>

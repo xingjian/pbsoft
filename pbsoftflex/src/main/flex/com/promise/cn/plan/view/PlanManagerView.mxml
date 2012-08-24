@@ -24,13 +24,14 @@
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"名称",dataField:"name",width:'150'},
-				{headerText:"开始时间",dataField:"startDate",width:'100'},
-				{headerText:"结束时间",dataField:"endDate",width:'100'},
+				{headerText:"计划开始时间",dataField:"startDate",width:'100'},
+				{headerText:"计划结束时间",dataField:"endDate",width:'100'},
 				{headerText:"当前进度",dataField:"currentValue",width:'180',itemRenderer:new ClassFactory(ProgressBarItemRenderer)},
 				{headerText:"创建人",dataField:"createUser",width:'80'},
 				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
 				{headerText:"是否激活",dataField:"activateToString"},
-				{headerText:"激活时间",dataField:"activateDateToString"}
+				{headerText:"激活时间",dataField:"activateDateToString",width:'120'},
+				{headerText:"结束时间",dataField:"realEndDate",width:'100'}
 				];
 			
 			[Bindable]
@@ -83,10 +84,15 @@
 			public function appendRecord():void{
 				if(null!=pageGrid.selectedItem){
 					var tr:TaskRecord = pageGrid.selectedItem as TaskRecord;
-					var addPlanLog:AddPlanLog = new AddPlanLog();
-					addPlanLog.taskRecord = tr;
-					PopUpManager.addPopUp(addPlanLog,this,true);
-					Global.centerPopUpPos(addPlanLog);
+					if(tr.pass=="0"){
+						var addPlanLog:AddPlanLog = new AddPlanLog();
+						addPlanLog.addEventListener("saveSuccess",refresh);
+						addPlanLog.taskRecord = tr;
+						PopUpManager.addPopUp(addPlanLog,this,true);
+						Global.centerPopUpPos(addPlanLog);
+					}else{
+						Alert.show("该任务计划已经在"+tr.realEndDate+"结束了,不能添加任务记录！","系统提示");	
+					}
 				}else{
 					Alert.show("请选择一条任务记录！","系统提示");
 				}
@@ -96,9 +102,13 @@
 			public function activeRecord():void{
 				if(null!=pageGrid.selectedItem){
 					var tr:TaskRecord = pageGrid.selectedItem as TaskRecord;
-					tr.activate = "1";
-					tr.activateDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
-					taskRecordServiceUpdate.updateTaskRecord(tr);
+					if(tr.pass=="0"){
+						tr.activate = "1";
+						tr.activateDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+						taskRecordServiceUpdate.updateTaskRecord(tr);
+					}else{
+						Alert.show("该任务计划已经在"+tr.realEndDate+"结束了,不能再次激活！","系统提示");	
+					}
 				}else{
 					Alert.show("请选择一条任务记录！","系统提示");
 				}
@@ -107,11 +117,22 @@
 			public function passRecord():void{
 				if(null!=pageGrid.selectedItem){
 					var trpass:TaskRecord = pageGrid.selectedItem as TaskRecord;
-					trpass.pass = "1";
-					trpass.endDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
-					taskRecordServiceUpdate.updateTaskRecord(trpass);
+					if(trpass.pass=="0"){
+						Alert.show("确定要结束该任务计划？","系统提示",3,null,endTaskHandler,null,Alert.NO);
+					}else{
+						Alert.show("该任务计划已经在"+trpass.realEndDate+"结束了！","系统提示");					
+					}
 				}else{
 					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			public function endTaskHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					var trpass:TaskRecord = pageGrid.selectedItem as TaskRecord;
+					trpass.pass = "1";
+					trpass.realEndDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+					taskRecordServiceUpdate.updateTaskRecord(trpass);
 				}
 			}
 			
@@ -168,11 +189,16 @@
 			//编辑面板
 			public function editRecord():void{
 				if(null!=pageGrid.selectedItem){
-					var editPlan:EditPlan = new EditPlan();
-					editPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addTaskRecordSuccess);
-					editPlan.taskRecord = pageGrid.selectedItem as TaskRecord;
-					PopUpManager.addPopUp(editPlan,this,true);
-					Global.centerPopUpPos(editPlan);
+					var trpass:TaskRecord = pageGrid.selectedItem as TaskRecord;
+					if(trpass.pass=="0"){
+						var editPlan:EditPlan = new EditPlan();
+						editPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addTaskRecordSuccess);
+						editPlan.taskRecord = trpass;
+						PopUpManager.addPopUp(editPlan,this,true);
+						Global.centerPopUpPos(editPlan);
+					}else{
+						Alert.show("该任务计划已经在"+trpass.realEndDate+"结束了,不能对其进行修改操作！","系统提示");		
+					}
 				}else{
 					Alert.show("请选择一条任务记录进行修改！","系统提示");
 				}

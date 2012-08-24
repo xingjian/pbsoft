@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()" 
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" title="{titleStr}" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="250" xmlns:view="com.promise.cn.common.view.*">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="250" xmlns:view="com.promise.cn.common.view.*" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<fx:Array id="validators">
 			<mx:StringValidator id="userNameValidator" trigger="{saveBtn}" source="{userName}" property="text" required="true" requiredFieldError="用户名不能为空！" />
@@ -17,6 +17,7 @@
 			import com.promise.cn.common.vo.PBUser;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			
 			import mx.controls.Alert;
@@ -142,5 +143,4 @@
 	<mx:LinkButton x="128" y="42" label="检查用户名" click="linkBtnClick(event)" color="#EFB01A" fontWeight="bold"/>
 	<s:Label x="61" y="198" width="276" height="18" color="#EB0E0E" text="{errorTip}" textAlign="center" verticalAlign="middle"/>
 	<s:Label id="checkUserLabel" x="220" textAlign="center" verticalAlign="middle" y="47" width="155" text="{checkUserMess}"/>
-	
-</s:TitleWindow>
+</views:PBTitleWindow>

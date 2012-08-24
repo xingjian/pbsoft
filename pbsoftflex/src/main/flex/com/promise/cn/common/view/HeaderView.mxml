@@ -50,11 +50,11 @@
 			
 			private function setClockTime(event:TimerEvent):void{
 				var date:Date=new Date();
-				var t:String=date.getFullYear()+"年"+(date.getMonth()+1)+"月"+date.getDate()+"日"+"   "+getWeek(date.getDay())+"  "+date.getHours()+":"+date.getMinutes()+":"+getSecondsStr(date.getSeconds());
+				var t:String=date.getFullYear()+"年"+(date.getMonth()+1)+"月"+date.getDate()+"日"+"   "+getWeek(date.getDay())+"  "+date.getHours()+" : "+getTimeStr(date.getMinutes())+" : "+getTimeStr(date.getSeconds());
 				time.text=t; 
 			}
 			
-			private function getSecondsStr(second:int):String{
+			private function getTimeStr(second:int):String{
 				var secondStr:String = "";
 				if(second>=0&&second<=9){
 					secondStr = "0"+second;
@@ -63,6 +63,8 @@
 				}
 				return secondStr;
 			}
+			
+			
 			
 			private function getWeek(week:int):String{
 				switch(week){

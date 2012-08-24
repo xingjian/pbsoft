@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" titleIcon="{Icons.distributePower}"
 		 xmlns:s="library://ns.adobe.com/flex/spark" close="closeBtnClick()" title="{'设置'+pbUser.name+'权限'}" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="400" xmlns:view="com.promise.cn.framework.view.*">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="400" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 	</fx:Declarations>
 	<fx:Metadata>
@@ -13,6 +13,7 @@
 			import com.promise.cn.common.vo.PBUser;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			
 			import mx.collections.ArrayCollection;
@@ -123,4 +124,4 @@
 			<s:Button label="关 闭" click="closeBtnClick(event)" />
 		</s:HGroup>
 	</s:VGroup>
-</s:TitleWindow>
+</views:PBTitleWindow>

@@ -14,6 +14,7 @@
 			import com.promise.cn.framework.util.PBConstant;
 			
 			import mx.controls.Alert;
+			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.mxml.RemoteObject;
@@ -73,33 +74,49 @@
 							PopUpManager.addPopUp(distributePower,this,true);
 							Global.centerPopUpPos(distributePower);
 						}else{
-							Alert.show("请选择相关人员！");
+							Alert.show("请选择相关人员！","系统提示");
 						}
 						break;
 					case 'addUser':
 						var pbUserTW:PBUserTitleWindow = new PBUserTitleWindow();
 						pbUserTW.titleStr = "增加用户";
+						pbUserTW.titleIcon = Icons.addIcon;
 						pbUserTW.addEventListener(PBConstant.APP_PBUSERTITLEWINDOW,pbUserTWEventHandle);
 						PopUpManager.addPopUp(pbUserTW,this,true);
 						Global.centerPopUpPos(pbUserTW);
 						break;
 					case 'removeUser':
-						var pbUser:PBUser = pageGrid.selectedItem as PBUser;
-						userServiceDelete.deletePBUser(pbUser.id);
+						removeUser();
 						break;
 					case 'editUser':
 						if(pageGrid.selectedItem!=null){
 							var pbUserTW_Edit:PBUserTitleWindow = new PBUserTitleWindow();
 							pbUserTW_Edit.titleStr = "修改用户";
+							pbUserTW_Edit.titleIcon = Icons.editIcon;
 							pbUserTW_Edit.pbUser = pageGrid.selectedItem as PBUser;
 							pbUserTW_Edit.userType = false;
 							pbUserTW_Edit.addEventListener(PBConstant.APP_PBUSERTITLEWINDOW,pbUserTWEventHandle);
 							PopUpManager.addPopUp(pbUserTW_Edit,this,true);
 							Global.centerPopUpPos(pbUserTW_Edit);
 						}else{
-							Alert.show("请选择相关人员！");
+							Alert.show("请选择相关人员！","系统提示");
 						}
 						break;
+				}
+			}
+			
+			public function removeUser():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定要删除该用户吗？","系统提示",3,null,delHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择一条用户记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					var pbUser:PBUser = pageGrid.selectedItem as PBUser;
+					userServiceDelete.deletePBUser(pbUser.id);
 				}
 			}
 			

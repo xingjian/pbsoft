@@ -13,6 +13,8 @@
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
+			import com.promise.cn.event.PBEvent;
+			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBUtil;
@@ -37,6 +39,8 @@
 			
 			//保存成功
 			public function taskRcordServiceHandle(event:ResultEvent):void{
+				dispatchEvent(new AppEvent("saveSuccess"));
+				closeWindow();
 				Alert.show("任务记录添加成功，请努力加油","系统提示");
 			}
 			
