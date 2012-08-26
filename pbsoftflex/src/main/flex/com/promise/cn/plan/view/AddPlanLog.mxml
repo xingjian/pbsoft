@@ -58,7 +58,7 @@
 			//增加日志
 			protected function btnCommitHandle(event:MouseEvent):void{
 				var taskLog:TaskRecordLog = new TaskRecordLog();
-				taskLog.createDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+				taskLog.createDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS ",new Date());
 				taskLog.remark = remarkText.text;
 				taskLog.value = String(pb.value);
 				taskLog.taskRecord = this.taskRecord;

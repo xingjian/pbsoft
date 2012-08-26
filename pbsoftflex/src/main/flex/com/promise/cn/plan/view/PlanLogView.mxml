@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"  title="日志记录"
+					 xmlns:s="library://ns.adobe.com/flex/spark"  titleIcon="{Icons.planappend}" close="closeWindow()"
+					 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:views="com.promise.cn.views.*" width="600" height="300" xmlns:view="com.promise.cn.framework.view.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.renderer.PlanLogProgressBarItemRenderer;
+			import com.promise.cn.common.renderer.ProgressBarItemRenderer;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"任务名称",dataField:"taskRecord.name",width:'130'},
+				{headerText:"录入时间",dataField:"createDate",width:'120'},
+				{headerText:"当前进度",dataField:"value",width:'140',itemRenderer:new ClassFactory(PlanLogProgressBarItemRenderer)},
+				{headerText:"备注",dataField:"remark",width:'100'}];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"删除",uri:"removeRecordLog",icon:Icons.removeIcon}]
+			
+			private var taskRecordLogService:RemoteObject;
+			private var taskRecordLogServiceDelete:RemoteObject;	
+			[Bindable]
+			public var taskRecordID:String = "";
+			
+			//初始化方法
+			public function init():void{
+				taskRecordLogService = Global.getRemoteObject("taskRecordService",taskRecordLogServiceHandle);
+				taskRecordLogServiceDelete = Global.getRemoteObject("taskRecordService",taskRecordLogServiceDeleteHandle);
+				taskRecordLogService.getTaskRecordLogByTaskRecordID(taskRecordID,1,20);
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'removeRecordLog':
+						removeRecordLog();
+						break;
+				}
+			}
+			
+			public function closeWindow(event:Event = null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//删除日志
+			public function removeRecordLog():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定删除日志记录？","系统提示",3,null,delHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择日志记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					taskRecordLogServiceDelete.deleteTaskRecordLog(pageGrid.selectedItem.id);
+				}
+			}
+			
+			//查询任务记录成功
+			public function taskRecordLogServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			public function taskRecordLogServiceDeleteHandle(event:ResultEvent):void{
+				Alert.show("删除日志成功！","系统提示");
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+				taskRecordLogService.getTaskRecordLogByTaskRecordID(taskRecordID,pageGrid.pageNo,pageGrid.pageSize);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%">
+		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%" />
+		<s:HGroup width="100%" horizontalAlign="center">
+			<s:Button label="关闭窗口" click="closeWindow(event)" />
+		</s:HGroup>
+	</s:VGroup>
+</views:PBTitleWindow>

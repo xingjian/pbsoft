@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:MXDataGridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  focusEnabled="true">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.plan.view.PlanLogView;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			protected function clickHandler(event:MouseEvent):void{
+				var planID:String = data.id;
+				var plv:PlanLogView = new PlanLogView();
+				plv.taskRecordID = planID;
+				PopUpManager.addPopUp(plv,this,true);
+				Global.centerPopUpPos(plv);
+			}
+		]]>
+	</fx:Script>
+	<mx:LinkButton label="日志记录" fontWeight="bold" textDecoration="underline" color="#0000ff" click="clickHandler(event)" />
+</s:MXDataGridItemRenderer>
