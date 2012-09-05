@@ -61,4 +61,12 @@ public interface TaskRecordService {
 	 * @return
 	 */
 	public String deleteTaskRecordLog(String id);
+	/**
+	 * 获取任务id的日志记录
+	 * @param id
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
+	public PageSupport getTaskRecordLogByTaskRecordID(String id,int pageNo,int pageSize);
 }
