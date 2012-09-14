@@ -35,7 +35,7 @@
 				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
 				{headerText:"是否激活",dataField:"activateToString"},
 				{headerText:"激活时间",dataField:"activateDateToString",width:'120'},
-				{headerText:"结束时间",dataField:"realEndDate",width:'100',itemRenderer:new ClassFactory(TaskRecordRealEndDateRenderer)},
+				{headerText:"结束时间",dataField:"realEndDate",width:'120',itemRenderer:new ClassFactory(TaskRecordRealEndDateRenderer)},
 				{headerText:"操作",dataField:"id",width:'100',itemRenderer:new ClassFactory(PlanLinkButtonItemrenderer)}
 				];
 			
