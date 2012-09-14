@@ -14,6 +14,8 @@
 			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.plan.renderer.TaskRecordLevelRenderer;
+			import com.promise.cn.plan.renderer.TaskRecordRealEndDateRenderer;
 			import com.promise.cn.plan.vo.TaskRecord;
 			
 			import mx.controls.Alert;
@@ -25,6 +27,7 @@
 			
 			[Bindable]
 			public var header:Array =  [{headerText:"名称",dataField:"name",width:'150'},
+				{headerText:"重要性",dataField:"levelStr",width:'80',itemRenderer:new ClassFactory(TaskRecordLevelRenderer)},
 				{headerText:"计划开始时间",dataField:"startDate",width:'100'},
 				{headerText:"计划结束时间",dataField:"endDate",width:'100'},
 				{headerText:"当前进度",dataField:"currentValue",width:'180',itemRenderer:new ClassFactory(ProgressBarItemRenderer)},
@@ -32,7 +35,7 @@
 				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
 				{headerText:"是否激活",dataField:"activateToString"},
 				{headerText:"激活时间",dataField:"activateDateToString",width:'120'},
-				{headerText:"结束时间",dataField:"realEndDate",width:'100'},
+				{headerText:"结束时间",dataField:"realEndDate",width:'100',itemRenderer:new ClassFactory(TaskRecordRealEndDateRenderer)},
 				{headerText:"操作",dataField:"id",width:'100',itemRenderer:new ClassFactory(PlanLinkButtonItemrenderer)}
 				];
 			
@@ -106,7 +109,7 @@
 					var tr:TaskRecord = pageGrid.selectedItem as TaskRecord;
 					if(tr.pass=="0"){
 						tr.activate = "1";
-						tr.activateDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+						tr.activateDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
 						taskRecordServiceUpdate.updateTaskRecord(tr);
 					}else{
 						Alert.show("该任务计划已经在"+tr.realEndDate+"结束了,不能再次激活！","系统提示");	
@@ -133,7 +136,7 @@
 				if(event.detail==Alert.YES){
 					var trpass:TaskRecord = pageGrid.selectedItem as TaskRecord;
 					trpass.pass = "1";
-					trpass.realEndDate = PBUtil.DateToString("MM-DD-YYYY",new Date());
+					trpass.realEndDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
 					taskRecordServiceUpdate.updateTaskRecord(trpass);
 				}
 			}

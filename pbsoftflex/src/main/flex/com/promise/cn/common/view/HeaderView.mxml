@@ -81,6 +81,7 @@
 			
 			//登陆成功方法
 			public function loginSuccessHandler(event:AppEvent):void{
+				userInfoHG.removeAllElements();//防止缓存登录的时候组件重复
 				pbUser = Global.pbUser;
 				var userInfoLabel:Label = new Label();
 				userInfoLabel.text = '欢迎 '+pbUser.name+' 登录PBSoft!';

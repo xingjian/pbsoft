@@ -7,7 +7,9 @@
  **/
 package com.promise.cn.framework.util
 {
+	import mx.controls.DateField;
 	import mx.formatters.DateFormatter;
+	import mx.utils.ObjectUtil;
 	
 	public class PBUtil
 	{
@@ -52,6 +54,16 @@ package com.promise.cn.framework.util
 		public static function StringToDate(date:String):Date{
 			var dateArray:Array = date.split("-");
 			return new Date(dateArray[2],dateArray[0]-1,dateArray[1]);
+		}
+		
+		//日期做比较
+		public static function CompareDate(firstDate:String,secondDate:String):Boolean{
+			if(ObjectUtil.dateCompare(DateField.stringToDate(firstDate,"YYYY-MM-DD JJ:NN:SS"),DateField.stringToDate(secondDate,"YYYY-MM-DD JJ:NN:SS")) == -1){
+				return true;
+			}else{
+				return false;
+			}
+
 		}
 	}
 }

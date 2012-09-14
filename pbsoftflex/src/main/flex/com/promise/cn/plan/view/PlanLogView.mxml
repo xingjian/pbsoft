@@ -38,6 +38,7 @@
 				taskRecordLogService = Global.getRemoteObject("taskRecordService",taskRecordLogServiceHandle);
 				taskRecordLogServiceDelete = Global.getRemoteObject("taskRecordService",taskRecordLogServiceDeleteHandle);
 				taskRecordLogService.getTaskRecordLogByTaskRecordID(taskRecordID,1,20);
+				pageGrid.dataGrid.wordWrap = true;
 			}
 			
 			//linkBarClick事件

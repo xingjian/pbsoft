@@ -26,13 +26,13 @@ package com.promise.cn.plan.vo
 		
 		public var activate:String;//1代表启动 0 代表未启动
 		
-		public var showTip:String;//是否提示0代表不提示，1代表提示
-		
 		public var pass:String;//是否完成0代表未完成，1代表完成
 		
 		public var activateDate:String;//激活时间
 		
 		public var realEndDate:String;
+		
+		public var level:Number;
 		
 		public function TaskRecord(object:Object=null)
 		{
@@ -46,11 +46,11 @@ package com.promise.cn.plan.vo
 				this.content = object.content;
 				this.taskType = object.taskType;
 				this.activate = object.activate;
-				this.showTip = object.showTip;
 				this.pass = object.pass;
 				this.startDate = object.startDate;
 				this.activateDate = object.activateDate;
 				this.realEndDate = object.realEndDate;
+				this.level = object.level;
 			}
 		}
 		
@@ -70,19 +70,19 @@ package com.promise.cn.plan.vo
 			}
 		}
 		
-		public function get showTipToString():String{
-			if(showTip=="0"){
-				return "不提示"
-			}else{
-				return "提示";
-			}
-		}
-		
 		public function get activateToString():String{
 			if(activate=="0"){
 				return "未激活";
 			}else{
 				return "激活"
+			}
+		}
+		
+		public function get levelStr():String{
+			if(this.level==1){
+				return "正常";
+			}else{
+				return "紧急";
 			}
 		}
 	}

@@ -4,7 +4,7 @@
 			   xmlns:mx="library://ns.adobe.com/flex/mx" width="412" height="300" xmlns:views="com.promise.cn.views.*">
 	<fx:Declarations>
 		<s:RadioButtonGroup id="radiogroup_active"/>
-		<s:RadioButtonGroup id="radiogroup_show"/>
+		<s:RadioButtonGroup id="radiogroup_level"/>
 		<fx:Array id="validators">
 			<mx:StringValidator id="planNumValidator" trigger="{saveBtn}" source="{nameText}" property="text" required="true" requiredFieldError="任务计划不能为空！" />
 		</fx:Array>
@@ -40,7 +40,7 @@
 				taskRecordService = Global.getRemoteObject("taskRecordService",taskRecordServiceHandle);
 				dictContentServiceSearch.listDictContent(DictConstant.PLANTYPE);
 				radiogroup_active.selectedValue = taskRecord.activate;
-				radiogroup_show.selectedValue = taskRecord.showTip;
+				radiogroup_level.selectedValue = taskRecord.level;
 			}
 			
 			//查询字典内容成功
@@ -68,7 +68,7 @@
 				nameText.text = "";
 				planTextArea.text = "";
 				radiogroup_active.selectedValue = "0";
-				radiogroup_show.selectedValue = "0";
+				radiogroup_level.selectedValue = "1";
 				startDF.selectedDate = new Date();
 				endDF.selectedDate = new Date();
 				personNameText.text = "";
@@ -85,17 +85,17 @@
 					taskRecord.name = nameText.text;
 					taskRecord.content = planTextArea.text;
 					var active:String = radiogroup_active.selectedValue.toString();
-					var show:String = radiogroup_show.selectedValue.toString();
+					var level:String = radiogroup_level.selectedValue.toString();
 					taskRecord.activate = active;
 					if(active=="1"){
 						taskRecord.activateDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
 					}else{
 						taskRecord.activateDate = "";
 					}
-					taskRecord.showTip = show;
 					taskRecord.startDate = startDF.text;
 					taskRecord.endDate = endDF.text;
 					taskRecord.pass = "0";
+					taskRecord.level = Number(level);
 					taskRecord.currentValue="0";
 					taskRecord.createUser = personNameText.text;
 					taskRecord.taskType = planTypeCB.selectedItem as DictContent;
@@ -116,7 +116,7 @@
 	<s:TextInput id="personNameText" x="87" y="71" width="120" text="{taskRecord.createUser}"/>
 	<s:Label x="212" y="71" height="22" text="计划类型：" verticalAlign="middle"/>
 	<s:ComboBox id="planTypeCB" labelField="name" dataProvider="{planTypeCBData}" x="280" y="70" width="120"/>
-	<s:Label x="212" y="105" height="23" text="是否提示：" verticalAlign="middle"/>
+	<s:Label x="212" y="105" height="23" text="重 要 性：" verticalAlign="middle"/>
 	<s:Label x="19" y="105" height="23" text="是否激活：" verticalAlign="middle"/>
 	<s:Label x="19" y="134" text="任务描述："/>
 	<s:TextArea id="planTextArea" text="{taskRecord.content}" x="19" y="152" width="381" height="74"/>
@@ -127,8 +127,8 @@
 		<s:RadioButton label="激活" value="1" groupName="radiogroup_active" />
 		<s:RadioButton label="不激活" value="0" groupName="radiogroup_active" />
 	</s:HGroup>
-	<s:HGroup x="282" y="103" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
-		<s:RadioButton label="提示" value="1" groupName="radiogroup_show" />
-		<s:RadioButton label="不提示" value="0" groupName="radiogroup_show" />
+	<s:HGroup x="272" y="103" width="117" height="23" verticalAlign="middle" horizontalAlign="center">
+		<s:RadioButton label="正常" value="1" groupName="radiogroup_level" />
+		<s:RadioButton label="紧急" value="2" groupName="radiogroup_level" />
 	</s:HGroup>
 </views:PBTitleWindow>
