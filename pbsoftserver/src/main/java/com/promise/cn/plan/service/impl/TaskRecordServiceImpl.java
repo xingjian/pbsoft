@@ -1,6 +1,8 @@
 /*@文件名: TaskRecordServiceImpl.java  @创建人: 邢健   @创建日期: 2011-12-12 上午11:11:13*/
 package com.promise.cn.plan.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	private PersistenceManager persistenceManager;
 	//查询对象
 	private QueryManager queryManager;
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	/**
 	 * 增加任务
@@ -90,6 +93,15 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 		persistenceManager.save(taskRecordLog);
 		taskRecordLog.getTaskRecord().setCurrentValue(taskRecordLog.getValue());
 		persistenceManager.update(taskRecordLog.getTaskRecord());
+		//任务记录记录任务进度到100的时候，自动结束任务
+		if(taskRecordLog.getTaskRecord().getCurrentValue().equals("100")){
+			TaskRecord tr = taskRecordLog.getTaskRecord();
+			if(tr.getPass().equals("0")){
+				tr.setPass("1");
+				tr.setRealEndDate(sdf.format(new Date()));
+				persistenceManager.update(tr);
+			}
+		}
 		return "success";
 	}
 
@@ -111,7 +123,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 		if(null!=valueObject&&valueObject.size()>0){//带条件查询
 			sql = sql + " "+QueryObject.creatSql(valueObject);
 		}
-		sql = sql + " order by t.createDate";
+		sql = sql + " order by t.createDate desc";
 		return queryManager.find(sql, pageNo, pageSize);
 	}
 	

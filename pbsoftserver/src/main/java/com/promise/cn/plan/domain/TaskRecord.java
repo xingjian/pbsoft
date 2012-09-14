@@ -27,7 +27,7 @@ import com.promise.cn.common.domain.DictContent;
  * @版本 V1.0   
  */
 @NamedQueries({
-	@NamedQuery(name="listTaskRecord",query="select t from TaskRecord t order by t.createDate asc")
+	@NamedQuery(name="listTaskRecord",query="select t from TaskRecord t order by t.createDate desc")
 })
 @Entity
 @SuppressWarnings("all")
@@ -54,13 +54,12 @@ public class TaskRecord implements Serializable {
 	
 	private String activate;//1代表启动 0 代表未启动
 	
-	private String showTip;//是否提示0代表不提示，1代表提示
-	
 	private String pass;//是否完成0代表未完成，1代表完成
 	
 	private String activateDate;
 	
 	private String realEndDate;
+	private int level;//任务级别 1正常 2紧急
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -147,14 +146,6 @@ public class TaskRecord implements Serializable {
 	public void setActivate(String activate) {
 		this.activate = activate;
 	}
-	@Basic
-	public String getShowTip() {
-		return showTip;
-	}
-
-	public void setShowTip(String showTip) {
-		this.showTip = showTip;
-	}
 
 	@Basic
 	public String getPass() {
@@ -181,4 +172,14 @@ public class TaskRecord implements Serializable {
 	public void setRealEndDate(String realEndDate) {
 		this.realEndDate = realEndDate;
 	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+	
+	
 }
