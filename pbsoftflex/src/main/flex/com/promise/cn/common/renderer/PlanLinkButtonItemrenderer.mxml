@@ -14,6 +14,7 @@
 			protected function clickHandler(event:MouseEvent):void{
 				var planID:String = data.id;
 				var plv:PlanLogView = new PlanLogView();
+				plv.title = data.name;
 				plv.taskRecordID = planID;
 				PopUpManager.addPopUp(plv,this,true);
 				Global.centerPopUpPos(plv);

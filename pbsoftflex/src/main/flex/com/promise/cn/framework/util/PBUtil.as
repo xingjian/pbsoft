@@ -7,6 +7,7 @@
  **/
 package com.promise.cn.framework.util
 {
+	import mx.controls.Alert;
 	import mx.controls.DateField;
 	import mx.formatters.DateFormatter;
 	import mx.utils.ObjectUtil;
@@ -58,10 +59,12 @@ package com.promise.cn.framework.util
 		
 		//日期做比较
 		public static function CompareDate(firstDate:String,secondDate:String):Boolean{
-			if(ObjectUtil.dateCompare(DateField.stringToDate(firstDate,"YYYY-MM-DD JJ:NN:SS"),DateField.stringToDate(secondDate,"YYYY-MM-DD JJ:NN:SS")) == -1){
-				return true;
-			}else{
+			var dateA:Date = DateFormatter.parseDateString(firstDate);
+			var dateB:Date = DateFormatter.parseDateString(secondDate);
+			if(ObjectUtil.dateCompare(dateA,dateB) == -1){
 				return false;
+			}else{
+				return true;
 			}
 
 		}
