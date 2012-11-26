@@ -44,7 +44,6 @@ public class MoneyConsumeServiceImpl implements MoneyConsumeService {
 	public String saveMoneyConsume(MoneyConsume moneyConsume) {
 		log.debug("saveMoneyConsume="+moneyConsume.getRemark());
 		persistenceManager.save(moneyConsume);
-		System.out.println("sdfadsfadsfadfa");
 		return "success";
 	}
 
