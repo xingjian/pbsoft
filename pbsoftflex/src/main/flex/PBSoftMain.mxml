@@ -31,7 +31,7 @@
 			
 		]]>
 	</fx:Script>
-	<s:VGroup width="100%" height="100%">
+	<s:VGroup width="100%" height="100%" gap="0">
 		<view:HeaderView width="100%" height="83" mainViewDC="mainViewDCHandler(event)" />
 		<view:MainView id="mainView" width="100%" height="100%" />
 		<view:FooterView width="100%" height="25" />

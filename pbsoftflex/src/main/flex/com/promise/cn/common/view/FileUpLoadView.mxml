@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" title="上传文档" titleIcon="{Icons.addIcon}" 
+					 xmlns:s="library://ns.adobe.com/flex/spark" close="closeHandler(event)" creationComplete="init()" 
+					 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:views="com.promise.cn.views.*" width="500" height="400">
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.redBar{
+			bar-color:#00ff00;			
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.FileGroup;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			private var selectedFiles: ArrayCollection = new ArrayCollection([]);
+			private var singleThreadFiles: Array = [];
+			[Bindable]
+			private var useSingleThread: Boolean = true;
+			private var fileRefs: FileReferenceList = new FileReferenceList();
+			public var fileGroup:FileGroup;
+			//这个地址是我测试用的服务器地址
+			private var urlrequest: URLRequest = new URLRequest("http://localhost:8888/pbsoft/upload/fileUpLoad");
+			 
+			//初始化方法
+			public function init():void{
+				fileRefs.addEventListener(Event.SELECT, fileSelectHandler);
+				fileRefs.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+			}
+			
+			private function fileSelectHandler(event:Event): void{
+				for each (var f: FileReference in fileRefs.fileList){
+					selectedFiles.addItem(f);
+				}
+				updateFileNames();
+			}
+			
+			public function updateFileNames():void{
+				var fName:String = "";
+				for each (var f: FileReference in selectedFiles){
+					fName = fName+f.name+";"
+				}
+				fileNameTI.text = fName;
+			}
+
+			private function uploadFile(): void{               
+				for each (var f: FileReference in selectedFiles){           
+					 try{
+						f.upload(urlrequest,"Filedata");
+						}
+					catch (e: Error){
+						Alert.show(e.message);
+					}
+				}    
+			}
+			
+			public function startUpLoad():void{
+				if (useSingleThread){
+						 //逐个上传
+						singleThreadFiles = selectedFiles.toArray().concat();
+						singleThreadFiles.reverse();
+						singleThreadUploadFile();
+						}else{
+				 			//多个文件同时上传
+							uploadFile();
+				}
+			}
+			
+			private function singleThreadUploadFile(): void
+			{
+				//FIFO：逐个从列表中取出，进行同步上传
+				if (singleThreadFiles.length > 0)
+				{
+					var f: FileReference = singleThreadFiles.pop() as FileReference;
+					f.addEventListener(Event.COMPLETE, doSingleUploadFileComplete);
+					urlrequest.method="POST";
+					urlrequest.data = "fileName="+f.name+"&fileGroup="+fileGroup.id+"&userName="+Global.pbUser.name+"&fileType="+f.type;
+					f.upload(urlrequest);
+				}
+			}
+			
+			private function doSingleUploadFileComplete(event: Event): void{
+				var f: FileReference = event.target as FileReference;
+				f.removeEventListener(Event.COMPLETE, doSingleUploadFileComplete);
+				singleThreadUploadFile();
+			}
+			
+			private function ioErrorHandler(e:IOErrorEvent): void{
+				Alert.show(e.text);
+			}
+			
+			public function selectfiles(event:Event = null):void{
+				fileRefs.browse([new FileFilter("文档 (*.doc, *.docx, *.txt)","*.doc;*.docx;*.txt")]);
+			}
+			
+			public function removeAllFiles(event:Event = null):void{
+				selectedFiles.removeAll();
+				updateFileNames();
+			}
+			
+			//关闭窗口
+			public function closeHandler(event:Event = null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function removeFile(f: FileReference): void{
+				var index: int = selectedFiles.getItemIndex(f);
+				if (index != -1)
+				selectedFiles.removeItemAt(index);
+				updateFileNames();
+			}
+ 
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:VGroup width="100%" height="100%">
+		<mx:DataGrid width="100%" height="100%" dataProvider="{selectedFiles}">
+			<mx:columns>
+				<mx:DataGridColumn headerText="名称" dataField="name" />
+				<mx:DataGridColumn headerText="大小(字节)" dataField="size" width="70" />
+				<mx:DataGridColumn headerText="类型" dataField="type" width="50" />
+				<mx:DataGridColumn headerText="上传进度">
+					<mx:itemRenderer>
+						<fx:Component>
+							<s:MXDataGridItemRenderer>
+								<fx:Script>
+									<![CDATA[
+										import mx.controls.Alert;
+										import mx.events.FlexEvent;
+										
+										override public function set data( value:Object) : void {  
+											super.data = value;
+										}
+										
+										protected function pb_creationCompleteHandler(event:FlexEvent):void{
+											var f:FileReference = data as FileReference;
+											f.addEventListener(ProgressEvent.PROGRESS, progressHandle);
+											f.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,
+												function (event: DataEvent): void
+												{
+													//服务器端一定要返回数据，否则，这个方法就不起作用了
+													pb.label = event.data;
+												}
+											);
+										}
+										
+										public function progressHandle(event:ProgressEvent):void{
+											pb.setProgress(event.bytesLoaded, event.bytesTotal);
+											if(event.bytesLoaded==event.bytesTotal){
+												hg.removeElement(lbBtn);
+												pb.label = "数据处理中......";
+											}
+										}
+										
+										public function deleteHandle(event:Event):void{
+											var f: FileReference = data as FileReference;
+											outerDocument.removeFile(f);
+										}
+										
+									]]>
+								</fx:Script>
+								<s:HGroup width="100%" height="100%" id="hg">
+									<mx:ProgressBar id="pb" mode="manual"  barSkin="com.promise.cn.common.skin.ProgressBarSkin" creationComplete="pb_creationCompleteHandler(event)" styleName="redBar" color="#0000FF" maximum="100" labelPlacement="center" width="100%" height="100%" />
+									<mx:LinkButton id="lbBtn"  label="删 除" color="#0000ff" fontWeight="bold"  click="deleteHandle(event)" />
+								</s:HGroup>
+							</s:MXDataGridItemRenderer>
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>					
+			</mx:columns>
+		</mx:DataGrid>
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label text="文件名称：" />
+			<s:TextInput width="100%" id="fileNameTI" editable="false" />
+			<s:Button label="浏览" click="selectfiles(event)" />
+			<s:Button label="清空" click="removeAllFiles(event)" />
+		</s:HGroup>
+		<s:HGroup width="100%" height="35" horizontalAlign="center" verticalAlign="middle">
+			<s:Button label="上传文件" click="startUpLoad()" />
+			<s:Button label="关闭窗口" click="closeHandler(event)" />
+		</s:HGroup>
+	</s:VGroup>
+</views:PBTitleWindow>

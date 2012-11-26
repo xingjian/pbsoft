@@ -7,6 +7,8 @@ public class Icons
 {
 	[Embed(source="../../../../../com/promise/cn/images/usermanager.png")]
 	 public static const userManager:Class;//用户管理
+	 [Embed(source="../../../../../com/promise/cn/images/dataManage.png")]
+	 public static const dataManager:Class;//用户管理
 	[Embed(source="../../../../../com/promise/cn/images/powermanager.png")]
 	public static const powerManager:Class;//权限管理
 	[Embed(source="../../../../../com/promise/cn/images/menumanager.png")]
@@ -37,6 +39,10 @@ public class Icons
 	public static const planactive:Class;//计划激活
 	[Embed(source="../../../../../com/promise/cn/images/planappend.gif")]
 	public static const planappend:Class;//计划激活
+	
+	[Embed(source="../../../../../com/promise/cn/images/root.gif")]
+	public static const root:Class;//计划激活
+	
 	
 	public function Icons()
 	{

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"  titleIcon="{Icons.searchIcon}"
+		 xmlns:s="library://ns.adobe.com/flex/spark" title="文档预览" creationComplete="init()" close="btnCloseClickHandler(event)"
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="1024" height="550" xmlns:views="com.promise.cn.views.*" xmlns:flexpaper="com.devaldi.controls.flexpaper.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.FileDoc;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var fileDoc:FileDoc;
+			
+			//初始化方法
+			public function init():void{
+				flexpaper.loadSwf(Global.FILEDOCLAODPATH+"/"+fileDoc.enName+".swf");
+			}
+			
+			//word 文档下载
+			protected function btnDocClickHandler(event:MouseEvent = null ):void
+			{
+				
+			}
+			
+			//pdf文档下载
+			protected function btnPdfClickHandler(event:MouseEvent = null):void
+			{
+				
+			}
+			
+			//关闭窗口
+			protected function btnCloseClickHandler(event:Event = null):void
+			{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%">
+		<flexpaper:FlexPaperViewer id="flexpaper" width="100%" height="100%" label="预案加载" Scale="1.5" />
+		<s:HGroup width="100%" horizontalAlign="center" height="30">
+			<s:Button label="下载（doc,docx）" click="btnDocClickHandler(event)" fontWeight="bold" color="#0000ff" />
+			<s:Button label="下载（pdf）" click="btnPdfClickHandler(event)" fontWeight="bold" color="#0000ff" />
+			<s:Button label="关闭" click="btnCloseClickHandler(event)" color="#0000ff" fontWeight="bold" />
+		</s:HGroup>
+	</s:VGroup>
+	
+</views:PBTitleWindow>

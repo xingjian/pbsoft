@@ -31,7 +31,8 @@
 					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager},
 					{label:"字典管理",uri:"dictManager",icon:Icons.dict},
 					{label:"计划管理",uri:"planManager",icon:Icons.plan},
-					{label:"消费管理",uri:"moneyconsumeManager",icon:Icons.moneyconsume}]);
+					{label:"消费管理",uri:"moneyconsumeManager",icon:Icons.moneyconsume},
+					{label:"文档管理",uri:"dataManager",icon:Icons.dataManager}]);
 				initDeskView();
 			}
 			

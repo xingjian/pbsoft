@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"  titleIcon="{Icons.addIcon}" close="closeWindow(event)"
+					 xmlns:s="library://ns.adobe.com/flex/spark" title="增加文档组" creationComplete="init()"
+					 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:views="com.promise.cn.views.*" width="280" height="200">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.vo.FileGroup;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var parentFileGroup:FileGroup;
+			
+			private var fileManagerService:RemoteObject;
+			
+			private var fileGroup:FileGroup;
+			
+			//初始化方法
+			public function init():void{
+				fileManagerService = Global.getRemoteObject("fileManagerService",fileManagerServiceHandle);
+			}
+			
+			public function fileManagerServiceHandle(event:ResultEvent):void{
+				fileGroup.id = event.result as String;
+				dispatchEvent(new AppEvent("saveFileGroupSuccess",fileGroup));
+				closeWindow(null);
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event = null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			protected function saveBtnClick(event:MouseEvent):void
+			{
+				fileGroup = new FileGroup();
+				fileGroup.name = fileGroupNameTI.text;
+				fileGroup.remark = remarkTA.text;
+				fileGroup.parent = parentFileGroup;
+				fileManagerService.addFileGroup(fileGroup);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" verticalAlign="middle" gap="0" paddingTop="0" top="0">
+		<s:Form width="100%" top="-20" left="-15" right="-15" >
+			<s:layout>
+				<s:FormLayout id="frmLay" gap="-10" paddingTop="-10" />
+			</s:layout>
+			<s:FormItem width="100%" label="上级目录 : ">
+				<s:Label text="{parentFileGroup.name}" width="100%" />
+			</s:FormItem>
+			<s:FormItem width="100%" label="目录名称 :">
+				<s:TextInput id="fileGroupNameTI" width="100%"  />
+			</s:FormItem>
+			<s:FormItem width="100%" label="备注：">
+				<s:TextArea  width="100%" id="remarkTA" height="70" />
+			</s:FormItem>
+			<s:FormItem>
+				<s:HGroup width="100%" horizontalAlign="center">
+					<s:Button label="保存" click="saveBtnClick(event)" />
+					<s:Button label="关闭" click="closeWindow(event)" />
+				</s:HGroup>
+			</s:FormItem>
+		</s:Form>
+	</s:VGroup>
+</views:PBTitleWindow>

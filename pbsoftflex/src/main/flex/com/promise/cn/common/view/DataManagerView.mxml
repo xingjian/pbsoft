@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:flexpaper="com.devaldi.controls.flexpaper.*" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*" >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.renderer.FileDocRenderer;
+			import com.promise.cn.common.vo.FileGroup;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.MenuEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			import spark.components.Application;
+			
+			[Bindable]
+			private var treeData:ArrayCollection = new ArrayCollection();
+			private var queryFileManagerService:RemoteObject;
+			private var deleteFileManagerService:RemoteObject;
+			private var queryFileDocManagerService:RemoteObject;
+			
+			//事件树的右键菜单
+			[Bindable]
+			public var treeItems:Array = [  
+				new ContextMenuItem("上传文档",false,true,true),  
+				new ContextMenuItem("创建文件组",false,true,true),
+				new ContextMenuItem("删除文件组",false,true,true),
+			];
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"名称",dataField:"fileName",width:'280'},
+				{headerText:"上传人",dataField:"userName",width:'80'},
+				{headerText:"上传时间",dataField:"uptime",width:'120'},
+				{headerText:"组名",dataField:"fileGroup.name",width:'120'},
+				{headerText:"操作",dataField:"url",width:'80',itemRenderer: new ClassFactory(FileDocRenderer)}
+			];
+			
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"增加",uri:"addFildDoc",icon:Icons.addIcon},
+				{label:"修改",uri:"editFileDoc",icon:Icons.editIcon},
+				{label:"删除",uri:"removeFileDoc",icon:Icons.removeIcon}
+			]
+			
+			//初始化方法
+			public function init():void{
+				deleteFileManagerService = Global.getRemoteObject("fileManagerService",deleteFileManagerServiceHandle);
+				queryFileManagerService = Global.getRemoteObject("fileManagerService",queryFileManagerServiceHandle);
+				queryFileDocManagerService = Global.getRemoteObject("fileManagerService",queryFileDocManagerServiceHandle);
+				queryFileDocManagerService.getFileDocPageSupport(1,20);
+				queryFileManagerService.getAllFileGroupTree();
+				tree.contextMenu = getTreeContxtMenu();
+			}
+			
+		 	//查询文件成功
+			public function queryFileDocManagerServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			//删除成功
+			public function deleteFileManagerServiceHandle(event:ResultEvent):void{
+				var deleteGroupID:String = event.result.toString();
+				var fileGroupDelete:FileGroup = tree.selectedItem as FileGroup;
+				var listTemp:ArrayCollection = fileGroupDelete.parent.children;
+				deleteTreeNodeByFileGroup(listTemp,fileGroupDelete);
+				//解决删除一个文件组图标不变化的问题
+				if(null!=listTemp&&listTemp.length==0){
+					fileGroupDelete.parent.children = null;
+				}
+				Alert.show("删除成功！","系统提示");
+			}
+
+			public function deleteTreeNodeByFileGroup(list:ArrayCollection,fileGroup:FileGroup):void{
+				for(var i:int=0;i<list.length;i++){
+					var fg:FileGroup = list.getItemAt(i) as FileGroup;
+					if(fg.id == fileGroup.id){
+						list.removeItemAt(i);
+						break;
+					}
+				}
+			}
+			
+			//查询文档目录树成功
+			public function queryFileManagerServiceHandle(event:ResultEvent):void{
+				treeData = event.result as ArrayCollection;
+				tree.selectedIndex=0;
+				tree.callLater(expand,null);
+			}
+			
+			//默认打开一层
+			private function expand():void{
+				tree.expandItem(tree.selectedItem,true);
+				//这里可以随便指定展开的节点，如果超出默认展开最后一个根节点
+				//tree.selectedIndex=1;
+				//tree.expandItem(tree.selectedItem,true);
+			}
+			
+			//定义树的右键菜单
+			private function getTreeContxtMenu(): ContextMenu{   
+				var contextMenu: ContextMenu = new ContextMenu();   
+				contextMenu.hideBuiltInItems();   
+				contextMenu.customItems = treeItems;
+				for(var i:int=0;i<treeItems.length;i++){  
+					treeItems[i].addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,treeMenuItemHandler);  
+				}
+				return contextMenu;
+			}
+			
+			//保存成功
+			public function saveFileGroupHandle(event:AppEvent):void{
+				var fileGroupTemp:FileGroup = event.data as FileGroup;
+				//将返回来的对象直接放到数据源里面
+				var fileGroup:FileGroup = tree.selectedItem as FileGroup;
+				if(null==fileGroup.children){
+					var childrenTemp:ArrayCollection = new ArrayCollection();
+					fileGroup.children = childrenTemp;
+				}
+				fileGroup.children.addItem(fileGroupTemp);
+				Alert.show("保存成功","系统提示");
+			}
+			
+			private function treeMenuItemHandler(e:ContextMenuEvent):void{
+				var cmi:ContextMenuItem = e.currentTarget as ContextMenuItem;
+				var cmiStr:String = cmi.caption;
+				var treeNodeObject:FileGroup = tree.selectedItem as FileGroup;
+				if(cmiStr=="上传文档"){
+					var fileUpLoadView:FileUpLoadView = new FileUpLoadView();
+					fileUpLoadView.fileGroup = treeNodeObject;
+					PopUpManager.addPopUp(fileUpLoadView,tree,true);
+					Global.centerPopUpPos(fileUpLoadView);
+				}else if(cmiStr=="创建文件组"){
+					var addFileGroup:AddFileGroup = new AddFileGroup();
+					addFileGroup.addEventListener("saveFileGroupSuccess",saveFileGroupHandle);
+					addFileGroup.parentFileGroup = treeNodeObject;
+					PopUpManager.addPopUp(addFileGroup,this,true);
+					Global.centerPopUpPos(addFileGroup);
+				}else if(cmiStr=="删除文件组"){
+					if(treeNodeObject.id=="root"){
+						Alert.show("根目录不允许删除！","系统提示");
+					}else{
+						Alert.show("确定删除"+treeNodeObject.name+"文件组及子文件组？","系统提示",3,null,deleteFileGroup,null,Alert.CANCEL);
+					}
+				}
+			}
+			public function deleteFileGroup(event:CloseEvent):void{
+				if(event.detail == Alert.YES){
+					var treeNode:FileGroup = tree.selectedItem as FileGroup;
+					deleteFileManagerService.deleteFileGroup(treeNode);
+				}
+			}
+			
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'addFileDoc':
+						break;
+					case 'editFileDoc':
+						break;
+					case 'removeFileDoc':
+						break;
+				}
+			}
+			
+			protected function flexpaper_onDocumentLoadedErrorHandler(event:ErrorEvent):void{
+				Alert.show(event.currentTarget.toString());				
+			}
+			
+			protected function tree_itemDoubleClickHandler(event:ListEvent):void
+			{
+				var obejectTemp:Object = event.itemRenderer.data as Object;
+//				if(obejectTemp.name!="root"){
+//					loadSWF(obejectTemp.name+".swf");
+//				}
+			}
+			
+			//eventTree ICON 函数预警颜色：红，橙，黄，蓝
+			private function eventTreeIonFun(object:Object):*{
+				if(object.id=="root"){
+					return Icons.root;
+				}
+			}
+			
+			public function loadSWF(s:String):void{
+//				flexpaper.loadSwf(s);
+//				
+			}
+			
+			protected function pbt_enterHandler(event:FlexEvent):void
+			{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+			}
+			
+			public function refresh(event:AppEvent):void{
+				queryFileDocManagerService.getFileDocPageSupport(1,20);
+			}
+			
+		]]>
+	</fx:Script>
+		<s:VGroup width="25%" height="100%">
+			<mx:Tree id="tree" height="100%" width="100%" labelField="name" doubleClickEnabled="true" showRoot="true"  itemDoubleClick="tree_itemDoubleClickHandler(event)" dataProvider="{treeData}">
+			</mx:Tree>
+		</s:VGroup>
+		<s:VGroup width="100%"  verticalAlign="middle" height="100%">
+			<s:HGroup width="100%" verticalAlign="middle" height="35">
+				<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+				<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" />
+				<s:Spacer width="10" />
+			</s:HGroup>
+			<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+		</s:VGroup>
+</s:HGroup>

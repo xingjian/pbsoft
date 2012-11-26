@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   creationComplete="onInit()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+		<fx:XML id="xml" xmlns="">
+			<node id="#" label="所有">
+				<node id="101" label="Name101">
+					<node id="10101" label="Name10101"/>
+					<node id="10102" label="Name10102"/>
+					<node id="10103" label="Name10103"/>
+				</node>
+				<node id="102" label="Name102">
+					<node id="10201" label="Name10201"/>
+					<node id="10202" label="Name10202"/>
+				</node>
+				<node id="103" label="Name103">
+					<node id="10301" label="Name10301"/>
+				</node>
+			</node>
+		</fx:XML>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			private function onInit():void{
+				tree.selectedIndex=0;
+				tree.callLater(expand,null);
+			}
+			private function expand():void{
+				tree.expandItem(tree.selectedItem,true);
+				//这里可以随便指定展开的节点，如果超出默认展开最后一个根节点
+				tree.selectedIndex=1;
+				tree.expandItem(tree.selectedItem,true);
+			}
+		]]>
+	</fx:Script>
+	<mx:Tree id="tree" x="73" y="36" width="200" height="217" dataProvider="{xml}" labelField="@label"></mx:Tree>
+</s:Application>

@@ -27,6 +27,7 @@ package com.promise.cn.framework.util
 		public static var styleXML:XML = null;
 		public static var pbUser:PBUser;//登录成功后自动初始化
 		public static var backgroundImage:String;
+		public static var FILEDOCLAODPATH:String="";
 		
 		//传入[{label:"",uri:"",icon:"systemLogView",toolTip:""},"......."],返回[{},{}]
 		public static function checkPowerArray(arr:Array):ArrayList{
@@ -83,6 +84,7 @@ package com.promise.cn.framework.util
 			styleXML = new XML(x.style);
 			//背景图片路径
 			backgroundImage = x.backgroundImage;
+			FILEDOCLAODPATH = x.filedocloadpath;
 		}
 		
 		//返回远程对象

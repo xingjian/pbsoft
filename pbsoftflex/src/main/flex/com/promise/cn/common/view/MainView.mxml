@@ -68,6 +68,8 @@
 					return new MoneyConsumeManagerView();
 				}else if(url=="dictManager"){
 					return new DictManagerView();
+				}else if(url=="dataManager"){
+					return new DataManagerView();
 				}else{
 					return null;
 				}
