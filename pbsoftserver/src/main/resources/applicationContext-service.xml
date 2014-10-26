@@ -18,4 +18,8 @@
 	<bean id="taskRecordService" class="com.promise.cn.plan.service.impl.TaskRecordServiceImpl" autowire="byName" />
 	<!-- 菜单管理 -->
 	<bean id="menuService" class="com.promise.cn.common.service.impl.MenuServiceImpl" autowire="byName" />
+	<!-- 文档管理 -->
+	<bean id="fileManagerService" class="com.promise.cn.filemanager.service.impl.FileManagerServiceImpl" autowire="byName" />
+	<!-- 文档转换对象 -->
+	<bean id="converterService" class="com.promise.cn.common.service.impl.ConverterServiceImpl" autowire="byName" />
 </beans>

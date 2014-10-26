@@ -7,9 +7,20 @@
         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 	<!-- read jdbc.properties -->
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>classpath:jdbc.properties</value>
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:appconfig.properties</value>
+			</list>
 		</property>
+	</bean>
+	<bean id="globalKeys" class="com.promise.cn.common.utils.GlobalKeys">
+		<property name="uploadPath"><value>${appconfig.uploadpath}</value></property>
+		<property name="uploadPathTemp"><value>${appconfig.uploadpathtemp}</value></property>
+		<property name="swftoolspath"><value>${appconfig.swftoolspath}</value></property>
+		<property name="swftoolflashversion"><value>${appconfig.swftoolflashversion}</value></property>
+		<property name="uploadpathpdf"><value>${appconfig.uploadpathpdf}</value></property>
+		<property name="uploadpathswf"><value>${appconfig.uploadpathswf}</value></property>
 	</bean>
 	<!-- config dataSource -->
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
@@ -34,6 +45,8 @@
 				<value>com.promise.cn.plan.domain.TaskRecordLog</value>
 				<value>com.promise.cn.memorandum.domain.Memorandum</value>
 				<value>com.promise.cn.common.domain.Menu</value>
+				<value>com.promise.cn.filemanager.domain.FileGroup</value>
+				<value>com.promise.cn.filemanager.domain.FileDoc</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
