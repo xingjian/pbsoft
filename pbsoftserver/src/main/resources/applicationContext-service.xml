@@ -16,6 +16,8 @@
 	<bean id="memorandumService" class="com.promise.cn.memorandum.service.impl.MemorandumServiceImpl" autowire="byName" />
 	<!-- 任务管理 -->
 	<bean id="taskRecordService" class="com.promise.cn.plan.service.impl.TaskRecordServiceImpl" autowire="byName" />
+	<!-- 每天计划 -->
+	<bean id="dayPlanService" class="com.promise.cn.plan.service.impl.DayPlanServiceImpl" autowire="byName" />
 	<!-- 菜单管理 -->
 	<bean id="menuService" class="com.promise.cn.common.service.impl.MenuServiceImpl" autowire="byName" />
 	<!-- 文档管理 -->
