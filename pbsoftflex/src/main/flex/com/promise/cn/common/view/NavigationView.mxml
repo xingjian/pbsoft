@@ -16,10 +16,6 @@
 			import com.promise.cn.framework.view.IconLabelGroup;
 			
 			import mx.collections.ArrayList;
-			import mx.controls.Alert;
-			import mx.rpc.remoting.mxml.RemoteObject;
-			
-			import spark.events.IndexChangeEvent;
 			
 			[Bindable]
 			private var listArray:ArrayList;
@@ -31,6 +27,7 @@
 					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager},
 					{label:"字典管理",uri:"dictManager",icon:Icons.dict},
 					{label:"计划管理",uri:"planManager",icon:Icons.plan},
+					{label:"每天计划",uri:"dayPlanManager",icon:Icons.dayPlan},
 					{label:"消费管理",uri:"moneyconsumeManager",icon:Icons.moneyconsume},
 					{label:"文档管理",uri:"dataManager",icon:Icons.dataManager}]);
 				initDeskView();

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" title="修改任务计划" titleIcon="{Icons.editIcon}"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="230" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.plan.vo.DayPlan;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			private var dayPlanService:RemoteObject;
+			[Bindable]
+			private var planTypeCBData:ArrayCollection;
+			private var dictContentServiceSearch:RemoteObject;
+			[Bindable]
+			public var dayPlan:DayPlan;
+			
+			//初始化方法
+			public function init():void{
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
+				dayPlanService = Global.getRemoteObject("dayPlanService",dayPlanServiceHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.PLANTYPE);
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				planTypeCBData = dictContentList;
+				planTypeCB.selectedItem = dayPlan.taskType;
+			}
+			
+			//保存成功
+			private function dayPlanServiceHandle(evnet:ResultEvent):void{
+				Alert.show("修改任务成功！","系统提示");
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_PLANTITLEWINDOW,"success");
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//重置
+			public function resetBtnClick():void{
+				nameText.text = "";
+				planTextArea.text = "";
+				createDF.selectedDate = new Date();
+				//设置默认选择第一个
+				if(null!=planTypeCBData&&planTypeCBData.length>0){
+					planTypeCB.selectedIndex = 0;
+				}
+			}
+			//提交
+			public function submitBtnClick():void{
+					dayPlan.name = nameText.text;
+					dayPlan.content = planTextArea.text;
+					dayPlan.createDate = createDF.text;
+					dayPlan.createUser = personNameText.text;
+					dayPlan.taskType = planTypeCB.selectedItem as DictContent;
+					dayPlanService.updateDayPlan(dayPlan);
+				}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" verticalAlign="middle" gap="10" horizontalAlign="center">
+		<s:Spacer height="5" />
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label  text="任务名称：" verticalAlign="middle"/>
+			<s:TextInput id="nameText" text="{dayPlan.name}"/>
+			<s:Label  text="任务日期："/>
+			<mx:DateField id="createDF" selectedDate="{PBUtil.StringToDate(dayPlan.createDate)}" width="120" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+		</s:HGroup>
+		<s:HGroup width="100%" verticalAlign="middle">
+			<s:Label   text="执行人员：" verticalAlign="middle"/>
+			<s:TextInput id="personNameText" editable="false" text="{dayPlan.createUser}" />
+			<s:Label  height="22" text="计划类型：" verticalAlign="middle"/>
+			<s:ComboBox id="planTypeCB" labelField="name" dataProvider="{planTypeCBData}"  width="120"/>
+		</s:HGroup>
+		<s:Label  text="任务描述：" width="100%" textAlign="left"/>
+		<s:TextArea id="planTextArea"  width="90%" height="50" text="{dayPlan.content}" />
+		<s:HGroup width="100%" horizontalAlign="center" gap="30">
+			<s:Button id="saveBtn" label="提交" click="submitBtnClick()"/>
+			<s:Button  label="重置" click="resetBtnClick()"/>
+			<s:Button  label="关闭" click="closeWindow()"/>
+		</s:HGroup>
+		<s:Spacer height="5" />
+	</s:VGroup>
+</views:PBTitleWindow>

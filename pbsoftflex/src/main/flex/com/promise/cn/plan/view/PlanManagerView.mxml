@@ -14,6 +14,7 @@
 			import com.promise.cn.framework.util.Icons;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.framework.vo.QueryObject;
 			import com.promise.cn.plan.renderer.TaskRecordLevelRenderer;
 			import com.promise.cn.plan.renderer.TaskRecordRealEndDateRenderer;
 			import com.promise.cn.plan.vo.TaskRecord;
@@ -56,7 +57,13 @@
 			public function init():void{
 				taskRecordService = Global.getRemoteObject("taskRecordService",taskRecordServiceHandle);
 				taskRecordServiceDelete = Global.getRemoteObject("taskRecordService",taskRecordServiceDeleteHandle);
-				taskRecordService.getTaskRecordPageSupport(null,1,20);
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "createUser";
+				valueObject1.value = Global.pbUser.name;
+				valueObject1.queryType = "0";
+				valueList.push(valueObject1);
+				taskRecordService.getTaskRecordPageSupport(valueList,1,20);
 				taskRecordServiceUpdate = Global.getRemoteObject("taskRecordService",taskRecordServiceUpdateHandle);
 			}
 			

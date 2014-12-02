@@ -27,6 +27,8 @@ public class Icons
 	public static const distributePower:Class;//分配权限
 	[Embed(source="../../../../../com/promise/cn/images/plan.png")]
 	public static const plan:Class;//任务计划
+	[Embed(source="../../../../../com/promise/cn/images/dayplanmanager.png")]
+	public static const dayPlan:Class;//任务计划
 	[Embed(source="../../../../../com/promise/cn/images/moneyconsumemanager.png")]
 	public static const moneyconsume:Class;//日常消费
 	[Embed(source="../../../../../com/promise/cn/images/dictmanager.png")]

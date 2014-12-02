@@ -14,12 +14,13 @@
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
 			import com.promise.cn.moneyconsume.view.MoneyConsumeManagerView;
+			import com.promise.cn.plan.view.DayPlanManagerView;
 			import com.promise.cn.plan.view.PlanManagerView;
 			
-			import mx.controls.Alert;
 			import mx.core.IVisualElement;
 			import mx.events.EffectEvent;
 			import mx.managers.PopUpManager;
+			
 			
 			[Bindable]
 			public var login:MainView_LoginView;
@@ -70,6 +71,8 @@
 					return new DictManagerView();
 				}else if(url=="dataManager"){
 					return new DataManagerView();
+				}else if(url=="dayPlanManager"){
+					return new DayPlanManagerView();
 				}else{
 					return null;
 				}

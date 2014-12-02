@@ -9,15 +9,8 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import com.promise.cn.common.vo.PBUser;
 			import com.promise.cn.framework.event.AppEvent;
-			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.PBConstant;
-			import com.promise.cn.moneyconsume.view.MoneyConsumeManagerView;
-			import com.promise.cn.plan.view.PlanManagerView;
-			
-			import mx.controls.Alert;
-			import mx.core.IVisualElement;
 			
 			//初始化方法
 			private function init():void{

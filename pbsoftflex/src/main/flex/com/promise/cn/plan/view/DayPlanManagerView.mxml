@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.vo.QueryObject;
+			import com.promise.cn.plan.vo.DayPlan;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"名称",dataField:"name",width:'150'},
+				{headerText:"日期",dataField:"createDate",width:'100'},
+				{headerText:"创建人",dataField:"createUser",width:'80'},
+				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
+				{headerText:"任务内容",dataField:"content",width:'80'}
+				];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"增加",uri:"addDayPlan",icon:Icons.addIcon},
+				{label:"修改",uri:"editDayPlan",icon:Icons.editIcon},
+				{label:"删除",uri:"removeDayPlan",icon:Icons.removeIcon}
+				]
+			
+			private var dayPlanService:RemoteObject;
+			private var dayPlanServiceDelete:RemoteObject;
+			private var dayPlanServiceUpdate:RemoteObject
+				
+			//初始化方法
+			public function init():void{
+				dayPlanService = Global.getRemoteObject("dayPlanService",dayPlanServiceHandle);
+				dayPlanServiceDelete = Global.getRemoteObject("dayPlanService",dayPlanServiceDeleteHandle);
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "createUser";
+				valueObject1.value = Global.pbUser.name;
+				valueObject1.queryType = "0";
+				valueList.push(valueObject1);
+				dayPlanService.getDayPlanPageSupport(valueList,1,20);
+				dayPlanServiceUpdate = Global.getRemoteObject("dayPlanService",dayPlanServiceUpdateHandle);
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'addDayPlan':
+						addDayPlan();
+						break;
+					case 'editDayPlan':
+						editDayPlan();
+						break;
+					case 'removeDayPlan':
+						removeDayPlan();
+						break;
+				}
+			}
+			
+			//修改成功
+			public function dayPlanServiceUpdateHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("任务更新成功！","系统提示");
+			}
+			
+			//查询面板
+			public function searchDayPlan():void{
+				var searchDayPlan:SearchDayPlan = new SearchDayPlan();
+				searchDayPlan.addEventListener(PBConstant.APP_PLANSEARCH,searchSuccessHandle);
+				PopUpManager.addPopUp(searchDayPlan,this,true);
+				Global.centerPopUpPos(searchDayPlan);
+			}
+			//查询成功
+			public function searchSuccessHandle(event:AppEvent):void{
+				pageGrid.setList(event.data);
+			}
+			
+			//增加面板
+			public function addDayPlan():void{
+				var addDayPlan:AddDayPlan = new AddDayPlan();
+				addDayPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addDayPlanSuccess);
+				PopUpManager.addPopUp(addDayPlan,this,true);
+				Global.centerPopUpPos(addDayPlan);
+			}
+			
+			public function removeDayPlan():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定要删除该信息吗？","系统提示",3,null,delHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					dayPlanServiceDelete.deleteDayPlan(pageGrid.selectedItem.id);
+				}
+			}
+			
+			public function dayPlanServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("任务计划删除成功！","系统提示");
+			}
+			
+			public function addDayPlanSuccess(event:AppEvent):void{
+				refresh(event);
+			}
+			
+			//编辑面板
+			public function editDayPlan():void{
+				if(null!=pageGrid.selectedItem){
+					var dayPlan:DayPlan = pageGrid.selectedItem as DayPlan;
+					var editDayPlan:EditDayPlan = new EditDayPlan();
+					editDayPlan.addEventListener(PBConstant.APP_PLANTITLEWINDOW,addDayPlanSuccess);
+					editDayPlan.dayPlan = dayPlan;
+					PopUpManager.addPopUp(editDayPlan,this,true);
+					Global.centerPopUpPos(editDayPlan);
+				}else{
+					Alert.show("请选择一条任务记录进行修改！","系统提示");
+				}
+			}
+			
+			//查询任务记录成功
+			public function dayPlanServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+				dayPlanService.getDayPlanPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
+			}
+			
+			protected function pbt_enterHandler(event:FlexEvent):void
+			{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+			}
+			
+		]]>
+	</fx:Script>
+	<s:HGroup width="100%"  verticalAlign="middle">
+		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<views:PBTextInput id="pbt"  enter="pbt_enterHandler(event)" />
+		<s:Spacer width="10" />
+	</s:HGroup>
+	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+</s:VGroup>
