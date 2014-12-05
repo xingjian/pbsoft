@@ -69,6 +69,7 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	@RemotingInclude
 	public String deleteTaskRecord(String id) {
 		log.debug("deleteTaskRecord id = "+id);
+		deleteTaskRecordLogByTaskRecordID(id);
 		persistenceManager.remove(TaskRecord.class,id);
 		return "success";
 	}
@@ -141,6 +142,14 @@ public class TaskRecordServiceImpl implements TaskRecordService {
 	public PageSupport getTaskRecordLogByTaskRecordID(String id, int pageNo,int pageSize) {
 		String hql = "from TaskRecordLog t where t.taskRecord.id='"+id+"' order by t.createDate desc";
 		return queryManager.find(hql, pageNo, pageSize);
+	}
+
+	@Override
+	public String deleteTaskRecordLogByTaskRecordID(String id) {
+		String hql = "from TaskRecordLog t where t.taskRecord.id='"+id+"'";
+		List<TaskRecordLog> list = queryManager.find(hql);
+		persistenceManager.removeAll(list);
+		return null;
 	}
 
 }

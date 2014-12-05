@@ -366,5 +366,18 @@ public class HibernateQueryManagerImpl extends HibernateDaoSupport implements Qu
         }
     }
 
+	@Override
+	public List findBySql(final String sql) {
+		 HibernateCallback callback = new HibernateCallback() {
+             public Object doInHibernate(Session session) throws HibernateException {
+                 return session.createSQLQuery(sql).list();
+             }
+         };
+	     try{
+	         return (List) getHibernateTemplate().execute(callback);
+	     }catch(Exception e){
+	         throw new DaoException(e);
+	     }
+	}
 
 }

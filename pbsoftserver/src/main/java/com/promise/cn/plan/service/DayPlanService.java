@@ -6,6 +6,7 @@ import java.util.List;
 import com.promise.cn.framework.support.PageSupport;
 import com.promise.cn.framework.support.QueryObject;
 import com.promise.cn.plan.domain.DayPlan;
+import com.promise.cn.plan.domain.DayPlanCalendarVO;
 
 /**   
  * @类名: DayPlanService.java 
@@ -15,6 +16,7 @@ import com.promise.cn.plan.domain.DayPlan;
  * @日期: 2011-12-12 上午11:06:22 
  * @版本 V1.0   
  */
+@SuppressWarnings("all")
 public interface DayPlanService {
 
 	/**
@@ -40,5 +42,26 @@ public interface DayPlanService {
 	 * @return
 	 */
 	public List<DayPlan> getAllDayPlan();
+	/**
+	 * 根据条件查询
+	 * @param valueObject
+	 * @param pageNo
+	 * @param pageSize
+	 * @return
+	 */
 	public PageSupport getDayPlanPageSupport(List<QueryObject> valueObject, int pageNo,int pageSize);
+	/**
+	 * 结束任务
+	 * @param id
+	 * @return
+	 */
+	public String passDayPlanByID(String id);
+	/**
+	 * 日历模式查询返回结果
+	 * @param start
+	 * @param end
+	 * @param user
+	 * @return
+	 */
+	public List<DayPlanCalendarVO> getDayPlanCalendarVOByDate(String start,String end,String user);
 }

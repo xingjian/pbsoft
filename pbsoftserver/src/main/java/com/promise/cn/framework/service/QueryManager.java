@@ -158,4 +158,5 @@ public interface QueryManager {
     public PageSupport find(final DetachedCriteria cw,final Order order,final int iPageNo,final int iPageSize) throws DaoException;
 
     public PageSupport find(final DetachedCriteria cw,final List orders,final int iPageNo,final int iPageSize) throws DaoException;
+    public List findBySql(final String sql);
 }

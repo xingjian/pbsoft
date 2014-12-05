@@ -61,6 +61,7 @@ public interface TaskRecordService {
 	 * @return
 	 */
 	public String deleteTaskRecordLog(String id);
+	public String deleteTaskRecordLogByTaskRecordID(String id);
 	/**
 	 * 获取任务id的日志记录
 	 * @param id
