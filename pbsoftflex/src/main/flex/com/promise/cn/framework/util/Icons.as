@@ -37,6 +37,8 @@ public class Icons
 	public static const saveIcon:Class;//保存按钮
 	[Embed(source="../../../../../com/promise/cn/images/planend.png")]
 	public static const planend:Class;//计划结束
+	[Embed(source="../../../../../com/promise/cn/images/changestatus.png")]
+	public static const changeStatus:Class;//更换视图
 	[Embed(source="../../../../../com/promise/cn/images/planactive.png")]
 	public static const planactive:Class;//计划激活
 	[Embed(source="../../../../../com/promise/cn/images/planappend.gif")]

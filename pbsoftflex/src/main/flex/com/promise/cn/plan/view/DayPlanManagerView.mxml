@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
-		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" currentState="calendar"
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*" xmlns:view1="com.promise.cn.plan.view.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<s:states>
+		<s:State name="table"/>
+		<s:State name="calendar"/>
+	</s:states>
+	<s:transitions>
+		<s:Transition id="tran" fromState="calendar" toState="table">
+			<s:Sequence>
+					<s:Fade id="fade2" alphaFrom="0" alphaTo="1"  target="{vg1}" duration="1500" />
+			</s:Sequence>
+		</s:Transition>
+		<s:Transition id="tran1" fromState="table" toState="calendar">
+			<s:Sequence>
+					<s:Fade id="fade3" alphaFrom="0" alphaTo="1"  target="{vg2}" duration="1500" />
+			</s:Sequence>
+		</s:Transition>
+	</s:transitions>
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.framework.event.AppEvent;
@@ -27,21 +43,28 @@
 				{headerText:"日期",dataField:"createDate",width:'100'},
 				{headerText:"创建人",dataField:"createUser",width:'80'},
 				{headerText:"任务类型",dataField:"taskType.name",width:'80'},
+				{headerText:"任务状态",dataField:"passToString",width:'80'},
 				{headerText:"任务内容",dataField:"content",width:'80'}
 				];
 			
 			[Bindable]
 			private var linkButtons:Array = [{label:"增加",uri:"addDayPlan",icon:Icons.addIcon},
 				{label:"修改",uri:"editDayPlan",icon:Icons.editIcon},
-				{label:"删除",uri:"removeDayPlan",icon:Icons.removeIcon}
+				{label:"删除",uri:"removeDayPlan",icon:Icons.removeIcon},
+				{label:"结束任务",uri:"passDayPlan",icon:Icons.planend},
+				{label:"日历模式",uri:"changeStatus",icon:Icons.changeStatus}
 				]
 			
 			private var dayPlanService:RemoteObject;
 			private var dayPlanServiceDelete:RemoteObject;
 			private var dayPlanServiceUpdate:RemoteObject
-				
-			//初始化方法
+			
 			public function init():void{
+			
+			}
+			
+			//初始化方法
+			public function initTableStatus():void{
 				dayPlanService = Global.getRemoteObject("dayPlanService",dayPlanServiceHandle);
 				dayPlanServiceDelete = Global.getRemoteObject("dayPlanService",dayPlanServiceDeleteHandle);
 				var valueList:Array=new Array();
@@ -67,6 +90,20 @@
 					case 'removeDayPlan':
 						removeDayPlan();
 						break;
+					case 'passDayPlan':
+						passDayPlan();
+						break;
+					case 'changeStatus':
+						changeStatus();
+						break;
+				}
+			}
+			
+			public function changeStatus():void{
+				if(currentState=="table"){
+					this.currentState = "calendar";
+				}else if(currentState=="calendar"){
+					this.currentState = "table";
 				}
 			}
 			
@@ -74,6 +111,14 @@
 			public function dayPlanServiceUpdateHandle(event:ResultEvent):void{
 				refresh(null);
 				Alert.show("任务更新成功！","系统提示");
+			}
+			
+			public function passDayPlan():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定任务完成吗？","系统提示",3,null,passDayPlanHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
 			}
 			
 			//查询面板
@@ -104,6 +149,17 @@
 				}
 			}
 			
+			public function passDayPlanHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					if(pageGrid.selectedItem.pass=="0"){
+						dayPlanServiceUpdate.passDayPlanByID(pageGrid.selectedItem.id);
+					}else{
+						Alert.show("该任务已经结束！","系统提示");
+					}
+					
+				}
+			}
+			
 			public function delHandler(event:CloseEvent):void{
 				if(event.detail==Alert.YES){
 					dayPlanServiceDelete.deleteDayPlan(pageGrid.selectedItem.id);
@@ -111,6 +167,7 @@
 			}
 			
 			public function dayPlanServiceDeleteHandle(event:ResultEvent):void{
+				pageGrid.selectedItem = null;
 				refresh(null);
 				Alert.show("任务计划删除成功！","系统提示");
 			}
@@ -143,17 +200,37 @@
 				dayPlanService.getDayPlanPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
 			}
 			
-			protected function pbt_enterHandler(event:FlexEvent):void
-			{
+			protected function pbt_enterHandler(event:FlexEvent):void{
 				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();
+				valueObject1.key = "name";
+				valueObject1.value = pbt.text;
+				valueObject1.queryType = "1";
+				valueList.push(valueObject1);
+				dayPlanService.getDayPlanPageSupport(valueList,1,200);
 			}
+			
+			private function showPass(item:Object, color:uint):uint  
+			{  
+				if (item.pass=="0")   
+				{  
+					return 0xE2718D;
+				}  
+				return color;  
+			} 
 			
 		]]>
 	</fx:Script>
-	<s:HGroup width="100%"  verticalAlign="middle">
-		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
-		<views:PBTextInput id="pbt"  enter="pbt_enterHandler(event)" />
-		<s:Spacer width="10" />
-	</s:HGroup>
-	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
-</s:VGroup>
+	<s:VGroup includeIn="table" id="vg1" width="100%" height="100%">
+		<s:HGroup width="100%"  verticalAlign="middle"  creationComplete="initTableStatus()">
+			<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+			<views:PBTextInput id="pbt"  enter="pbt_enterHandler(event)" />
+			<s:Spacer width="10" />
+		</s:HGroup>
+		<view:PageGrid id="pageGrid" customed="true"  rowColorFunction="showPass" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+	</s:VGroup>
+	<s:VGroup id="vg2" includeIn="calendar" width="100%" height="100%">
+		<view1:PBCalendarView showTable="changeStatus()" />
+	</s:VGroup>
+</s:Group>

@@ -94,7 +94,7 @@
 					valueObject5.queryType = "1";
 					valueList.push(valueObject5);
 				}
-				dayPlanService.getDayPlanPageSupport(valueList,1,200);
+				dayPlanService.getTaskRecordPageSupport(valueList,1,200);
 			}
 			
 		]]>

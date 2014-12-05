@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" creationComplete="init()" xmlns:view="com.promise.cn.plan.view.*">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	<fx:Metadata>
+		[Event(name="showTable",type="com.promise.cn.framework.event.AppEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.plan.vo.DayPlanCalendarVO;
+			
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			import spark.components.Group;
+			
+			
+			public var mainGroup:Group;
+			
+			[Bindable]
+			private var year:int;
+			[Bindable]
+			private var month:int;
+			[Bindable]
+			private var day:int;
+			
+			private var week:int;//星期几
+			private var nowLastDay:int;//本月最后一天
+			private var preLastDay:int;//上月最后一天
+			
+			[Bindable]
+			private var lineColor:uint=0xBBD0E7;
+			
+			[Bindable]
+			private var dateArray:ArrayCollection=new ArrayCollection();//存放日期
+			private var dayPlanArray:ArrayCollection=new ArrayCollection();//存放计划
+			private var dayPlanQueryService:RemoteObject;
+			
+			private function init():void{
+				dayPlanQueryService = Global.getRemoteObject("dayPlanService",dayPlanQueryServiceHandle);
+				var date:Date=new Date();
+				this.year=int(date.fullYear);
+				this.month=int(date.month)+1;
+				this.day=int(date.date);
+				this.week=int(date.day);
+				
+				this.nowLastDay=getLastDay(year,month,1).date;
+				this.preLastDay=getLastDay(year,month,-1).date;
+				this.dateArray=setDateArray();
+				showDate();
+			}
+			
+			//获取月份的最后一天
+			private function getLastDay(year:int,month:int,flag:Number):Date{
+				var dayDate:Date=new Date(year,month);
+				if(flag==1){
+					//获取本月的最后一天
+					dayDate['date']+=-1;
+					return dayDate;
+				}else if(flag==-1){
+					//获取上月的最后一天
+					dayDate['month']+=-1;
+					dayDate['date']+=-1;
+					return dayDate;
+				}else if(flag==0){
+					return dayDate;
+				}
+				return null;
+			}
+			
+			//设置日期数据
+			private function setDateArray():ArrayCollection{
+				var array:ArrayCollection=new ArrayCollection();
+				var dayDate:Date=new Date(year,month-1,1);
+				var week1:int=dayDate.day;
+				if(week1==0){
+					for(var i:int=1;i<=this.nowLastDay;i++){
+						var obj:Object={year:this.year,month:this.month,day:i,flag:1};
+						array.addItem(obj);
+					}
+					var len:int=35-this.nowLastDay;
+					var nextDate:Date=getLastDay(year,month,0);
+					for(var m:int=1;m<=len;m++){
+						var o:Object={year:nextDate.fullYear,month:nextDate.month+1,day:m,flag:0};
+						array.addItem(o);
+					}
+				}else{
+					var preDate:Date=getLastDay(year,month,-1);
+					for(var ii:int=week1-1;ii>=0;ii--){
+						var obj1:Object={year:preDate.fullYear,month:preDate.month+1,day:this.preLastDay-ii,flag:0};
+						array.addItem(obj1);
+					}
+					for(var iii:int=1;iii<=this.nowLastDay;iii++){
+						var obj2:Object={year:this.year,month:this.month,day:iii,flag:1};
+						array.addItem(obj2);
+						if(array.length==35)
+							break;
+					}
+					var len1:int=35-array.length;
+					var nextDate1:Date=getLastDay(year,month,0);
+					for(var mm:int=1;mm<=len1;mm++){
+						var o1:Object={year:nextDate1.fullYear,month:nextDate1.month+1,day:mm,flag:0};
+						array.addItem(o1);
+					}
+				}
+				return array;
+			}
+			
+			public function dayPlanQueryServiceHandle(event:ResultEvent):void{
+				dayPlanArray = event.result as ArrayCollection;
+				showDayPlan();
+			}
+			
+			public function showDayPlan():void{
+				for(var i:int=0;i<this.dateArray.length;i++){
+					var obj:Object=this.dateArray[i];
+					var day1:String=obj.day;
+					var month1:String=obj.month;
+					var year1:String=obj.year;
+					var timeStr:String = year1+"-"+handleDate(month1)+"-"+handleDate(day1);
+					var dpcvTemp:DayPlanCalendarVO = getDayPlanCalendarVOByDate(timeStr);
+					var progressBar:PBProgressBar = PBProgressBar(this["progressBar"+i]);
+					if(null!=dpcvTemp){
+						Label(this["n"+i]).text = ""+dpcvTemp.countName+"个任务";
+						Label(this["n"+i]).setStyle("color",0xFF0000);
+						progressBar.includeInLayout = true;
+						progressBar.visible = true;
+						progressBar.value = dpcvTemp.progressBarValue();
+					}else{
+						Label(this["n"+i]).text = "无任务";
+						Label(this["n"+i]).setStyle("color",0xCCCCCC);
+						progressBar.includeInLayout = false;
+						progressBar.visible = false;
+					}
+				}
+			}
+			
+			public function getDayPlanCalendarVOByDate(timeStr:String):DayPlanCalendarVO{
+				var rt:DayPlanCalendarVO = null;
+				for each (var dpcv:DayPlanCalendarVO in dayPlanArray){
+					if(timeStr==dpcv.createDate){
+						rt = dpcv;
+						break;
+					}
+				}
+				return rt;
+			}
+			
+			public function getDayPlanCalendarVO():void{
+				var o1:Object = dateArray[0];
+				var o2:Object = dateArray[dateArray.length-1];
+				var startTime:String= o1.year+"-"+handleDate(o1.month)+"-"+handleDate(o1.day);
+				var endTime:String= o2.year+"-"+handleDate(o2.month)+"-"+handleDate(o2.day);
+				dayPlanQueryService.getDayPlanCalendarVOByDate(startTime,endTime,Global.pbUser.name);
+			}
+			
+			//显示日期
+			private function showDate():void{
+				var bl:Boolean=true;
+				for(var i:int=0;i<this.dateArray.length;i++){
+					var obj:Object=this.dateArray[i];
+					var flag:int=int(obj.flag);
+					var day1:int=int(obj.day);
+					var month1:int=int(obj.month)-1;
+					var year1:int=int(obj.year)
+					Label(this["l"+i]).text=obj.day+"";
+					if(flag==0){
+						Label(this["l"+i]).setStyle("color",0xCCCCCC);
+					}
+					if(flag==1){
+						var _color:uint=uint(Label(this["l"+i]).getStyle("color"));
+						if(_color!=0xFF9933)
+							Label(this["l"+i]).clearStyle("color");
+					}
+					if(bl){
+						var date:Date=new Date();
+						if(year1==date.fullYear&&month1==date.month&&day1==date.date){
+							BorderContainer(this["b"+i]).setStyle("backgroundColor",0xFFFF99);
+						}else{
+							BorderContainer(this["b"+i]).clearStyle("backgroundColor");
+						}
+					}
+				}
+				getDayPlanCalendarVO();
+			}
+			
+			public function handleDate(str:String):String{
+				if(str.length==2){
+					return str;
+				}else{
+					return "0"+str;
+				}
+			}
+			
+			//点击日期操作
+			private function doClick(event:MouseEvent):void{
+				for(var i:int=0;i<this.dateArray.length;i++){
+					BorderContainer(this["b"+i]).clearStyle("backgroundColor");
+				}
+				var bc:BorderContainer=event.currentTarget as BorderContainer;
+				bc.setStyle("backgroundColor",0xFFFF99);
+				var index:int=int(bc.id.substring(1));
+				var obj:Object=this.dateArray[index];
+				var syear:String=obj.year;
+				var smonth:String=obj.month;
+				var sday:String=obj.day;
+				if(smonth.length==1)
+					smonth="0"+smonth;
+				if(sday.length==1)
+					sday="0"+sday;
+				var date:String=syear+"-"+smonth+"-"+sday;
+			}
+			
+			//更改日历 flag 1上年  2上月   3当月 4下月 5下年
+			private function doRefresh(flag:int):void{				
+				if(flag==1){
+					this.year=this.year-1;
+				}
+				if(flag==2){
+					this.month=this.month-1;
+					if(this.month==0){
+						this.year=this.year-1;
+						this.month=12;
+					}
+				}
+				if(flag==3){
+					var date:Date=new Date();
+					this.year=int(date.fullYear);
+					this.month=int(date.month)+1;
+					this.day=int(date.date);
+					this.week=int(date.day);
+				}
+				if(flag==4){
+					this.month=this.month+1;
+					if(this.month==13){
+						this.year=this.year+1;
+						this.month=1;					}
+				}
+				if(flag==5){
+					this.year=this.year+1;
+				}
+				
+				this.nowLastDay=getLastDay(year,month,1).date;
+				this.preLastDay=getLastDay(year,month,-1).date;
+				this.dateArray=setDateArray();
+				showDate();
+			}
+			
+			//列表显示
+			private function showTable():void{
+				var appEvent:AppEvent = new AppEvent("showTable");
+				appEvent.data = "showTable";
+				dispatchEvent(appEvent);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+	<s:Label text="{this.year}年{this.month}月 "  fontSize="30" fontWeight="bold" fontFamily="黑体" />
+	<s:BorderContainer width="840" height="540" borderColor="{this.lineColor}" left="60" top="50">
+		<s:Line width="838" top="40"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line width="838" top="140"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line width="838" top="240"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line width="838" top="340"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line width="838" top="440"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		
+		<s:Line height="538" left="120"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line height="538" left="240"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line height="538" left="360"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line height="538" left="480"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line height="538" left="600"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		<s:Line height="538" left="720"><s:stroke><s:SolidColorStroke color="{this.lineColor}" weight="1" caps="square"/></s:stroke></s:Line>
+		
+		<s:HGroup width="840" height="40" gap="2" left="1" top="1">
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="SUN日" left="20" top="10" fontSize="20" fontWeight="bold" color="0xFF9933"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="MON一" left="20" top="10" fontSize="20" fontWeight="bold"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="TUE二" left="20" top="10" fontSize="20" fontWeight="bold"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="WED三" left="20" top="10" fontSize="20" fontWeight="bold"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="THU四" left="20" top="10" fontSize="20" fontWeight="bold"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="118" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="FRI五" left="20" top="10" fontSize="20" fontWeight="bold"/>
+			</s:BorderContainer>
+			<s:BorderContainer width="117" height="38" borderVisible="false" backgroundColor="0xEEEEEE">
+				<s:Label text="SAT六" left="20" top="10" fontSize="20" fontWeight="bold" color="0xFF9933"/>
+			</s:BorderContainer>
+		</s:HGroup>
+		
+		<s:HGroup width="840" height="98" gap="2" left="1" top="41">
+			<s:BorderContainer id="b0" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg0" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l0" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n0" text="" color="0x999999" fontSize="12"/>
+					<view:PBProgressBar id="progressBar0" width="100" height="20" includeInLayout="false" visible="false" />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b1" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg1" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l1" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n1" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar1" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b2" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg2" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l2" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n2" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar2" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b3" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg3" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l3" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n3" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar3" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b4" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg4" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l4" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n4" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar4" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b5" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg5" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l5" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n5" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar5" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b6" width="117" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg6" width="117" top="6" horizontalAlign="center">
+					<s:Label id="l6" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n6" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar6" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+		
+		<s:HGroup width="840" height="60" gap="2" left="1" top="141">
+			<s:BorderContainer id="b7" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg7" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l7" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n7" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar7" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b8" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg8" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l8" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n8" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar8" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b9" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg9" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l9" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n9" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar9" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b10" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg10" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l10" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n10" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar10" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b11" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg11" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l11" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n11" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar11" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b12" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg12" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l12" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n12" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar12" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b13" width="117" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg13" width="117" top="6" horizontalAlign="center">
+					<s:Label id="l13" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n13" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar13" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+		
+		<s:HGroup width="840" height="60" gap="2" left="1" top="241">
+			<s:BorderContainer id="b14" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg14" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l14" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n14" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar14" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b15" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg15" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l15" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n15" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar15" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b16" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg16" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l16" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n16" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar16" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b17" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg17" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l17" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n17" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar17" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b18" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg18" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l18" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n18" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar18" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b19" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg19" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l19" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n19" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar19" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b20" width="117" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg20" width="117" top="6" horizontalAlign="center">
+					<s:Label id="l20" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n20" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar20" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+		
+		<s:HGroup width="840" height="98" gap="2" left="1" top="341">
+			<s:BorderContainer id="b21" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg21" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l21" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n21" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar21" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b22" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg22" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l22" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n22" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar22" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b23" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg23" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l23" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n23" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar23" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b24" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg24" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l24" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n24" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar24" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b25" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg25" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l25" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n25" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar25" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b26" width="118" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg26" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l26" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n26" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar26" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b27" width="117" height="98" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg27" width="117" top="6" horizontalAlign="center">
+					<s:Label id="l27" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n27" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar27" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+		
+		<s:HGroup width="840" height="98" gap="2" left="1" top="441">
+			<s:BorderContainer id="b28" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg28" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l28" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n28" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar28" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b29" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg29" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l29" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n29" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar29" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b30" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg30" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l30" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n30" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar30" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b31" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg31" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l31" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n31" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar31" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b32" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg32" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l32" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n32" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar32" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b33" width="118" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg33" width="118" top="6" horizontalAlign="center">
+					<s:Label id="l33" text="" fontSize="28" fontWeight="bold"/>
+					<s:Label id="n33" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar33" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+			<s:BorderContainer id="b34" width="117" height="97" borderVisible="false" buttonMode="true" click="doClick(event)">
+				<s:VGroup id="vg34" width="117" top="6" horizontalAlign="center">
+					<s:Label id="l34" text="" fontSize="28" fontWeight="bold" color="0xFF9933"/>
+					<s:Label id="n34" text="" color="0x999999"/>
+					<view:PBProgressBar id="progressBar34" width="100" height="20" includeInLayout="false" visible="false"  />
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:HGroup>
+	</s:BorderContainer>
+	
+	<!--详细值班情况面板-->
+	<s:HGroup horizontalAlign="center"  gap="12">
+		<s:Image source="com/promise/cn/images/preYear.png" buttonMode="true" click="doRefresh(1)"/>
+		<s:Image source="com/promise/cn/images/preMonth.png" buttonMode="true" click="doRefresh(2)"/>
+		<s:Image source="com/promise/cn/images/nowMonth.png" buttonMode="true" click="doRefresh(3)"/>
+		<s:Image source="com/promise/cn/images/nextMonth.png" buttonMode="true" click="doRefresh(4)"/>
+		<s:Image source="com/promise/cn/images/nextYear.png" buttonMode="true" click="doRefresh(5)"/>
+		<s:Image source="com/promise/cn/images/showTable.png" buttonMode="true" click="showTable()"/>
+	</s:HGroup>
+	</s:VGroup>	
+</s:Group>

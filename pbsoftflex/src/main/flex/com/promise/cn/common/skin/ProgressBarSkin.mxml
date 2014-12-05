@@ -1,30 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?> 
 <s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" >
-	
-	<fx:Script>
-		/**
-		 * @private
-		 */
-		override protected function initializationComplete():void
-		{
-			useChromeColor = true;
-			super.initializationComplete();
-		}
-		
-		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void{
-			if( getStyle('barColor') ) {
-				activeBar.color = getStyle('barColor');
-			}
-			
-			super.updateDisplayList(unscaledWidth, unscaledHeight);
-		}
+		<fx:Script> 
+		override protected function initializationComplete():void {
+			useChromeColor = true; super.initializationComplete(); 
+		} 
 	</fx:Script>
-	
-	<!-- layer 1: fill -->
-	<s:Rect left="1" right="1" top="1" bottom="1" >
+	<!-- layer 1: fill --> 
+	<s:Rect left="2" right="2" top="2" bottom="2" > 
 		<s:fill>
-			<s:SolidColor id="activeBar" color="#5eb737" alpha="1" />
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x54BDFF" alpha="1" ratio="0" /> 
+				<s:GradientEntry color="0x0DA2FF" alpha="1" ratio="1" />
+			</s:LinearGradient>
 		</s:fill>
 	</s:Rect>
-	
-</s:SparkSkin>
+	<!-- layer 2: border -->
+	<s:Rect left="2" right="2" top="2" bottom="2"  visible="false">
+		<s:stroke> 
+			<s:LinearGradientStroke rotation="90">
+				<s:GradientEntry color="0x3185DF" alpha=".9" />
+				<s:GradientEntry color="0x3185DF" alpha="0.5" />
+			</s:LinearGradientStroke>
+		</s:stroke> 
+	</s:Rect> 
+	<!-- layer 3: right edge --> 
+	<s:Rect right="1" top="2" bottom="2" width="1" >
+		<s:fill>
+			<s:SolidColor color="#3185DF" alpha="0.55" />
+		</s:fill> 
+	</s:Rect> 
+</s:SparkSkin> 
