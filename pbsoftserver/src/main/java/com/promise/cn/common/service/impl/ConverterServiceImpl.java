@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.jacob.activeX.ActiveXComponent;
-import com.jacob.com.Variant;
 import com.promise.cn.common.service.ConverterService;
 import com.promise.cn.common.utils.GlobalKeys;
 
@@ -40,25 +38,6 @@ public class ConverterServiceImpl implements ConverterService{
 	 public synchronized boolean convertWordTOPDFByWPS(String word, String pdf) {
          File pdfFile = new File(pdf);
          File wordFile = new File(word);
-         ActiveXComponent wps = null;
-         try {
-             wps = new ActiveXComponent("wps.application");
-             ActiveXComponent doc = wps.invokeGetComponent("Documents").invokeGetComponent("Open", new Variant(wordFile.getAbsolutePath()));
-             doc.invoke("ExportPdf", new Variant(pdfFile.getAbsolutePath()));
-             doc.invoke("Close");
-             doc.safeRelease();
-         } catch (Exception ex) {
-        	 ex.printStackTrace();
-             return false;
-         } catch (Error ex) {
-        	 ex.printStackTrace();
-             return false;
-         } finally {
-             if (wps != null) {
-                 wps.invoke("Terminate");
-                 wps.safeRelease();
-             }
-         }
          return true;
      }
 	 
