@@ -110,9 +110,9 @@
 	<s:Label x="19" y="10" height="22" text="计划名称：" verticalAlign="middle"/>
 	<s:TextInput id="nameText" x="87" y="10" width="313"/>
 	<s:Label x="19" y="40" width="60" height="23" text="开始时间：" verticalAlign="middle"/>
-	<mx:DateField id="startDF" x="87" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+	<mx:DateField id="startDF" x="87" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="YYYY-MM-DD" />
 	<s:Label x="212" y="40" width="60" height="23" text="结束时间：" verticalAlign="middle"/>
-	<mx:DateField id="endDF" x="280" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="MM-DD-YYYY" />
+	<mx:DateField id="endDF" x="280" y="40" selectedDate="{new Date()}" width="120" yearNavigationEnabled="true" formatString="YYYY-MM-DD" />
 	<s:Label x="19" y="71" height="22" text="执行人员：" verticalAlign="middle"/>
 	<s:TextInput id="personNameText" x="87" y="71" width="120"/>
 	<s:Label x="212" y="71" height="22" text="计划类型：" verticalAlign="middle"/>

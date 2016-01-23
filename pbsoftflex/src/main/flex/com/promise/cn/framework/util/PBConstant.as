@@ -25,7 +25,9 @@ package com.promise.cn.framework.util
 		public static const APP_MONEYCONSUMETITLEWINDOW:String = "freshMoneyConsume";
 		public static const APP_MONEYCONSUMESEARCH:String = "appMoneySumeSearch";
 		public static const APP_PLANTITLEWINDOW:String = "freshPlan";
+		public static const APP_WORKLOGTITLEWINDOW:String = "freshWorkLog";
 		public static const APP_PLANSEARCH:String = "appPlanSearch";
+		public static const APP_WORKLOGSEARCH:String = "appWorkLogSearch";
 		public static const APP_ICONLABEL_CLICK:String = "appIconLabelClick";
 		
 		//常用数字大小

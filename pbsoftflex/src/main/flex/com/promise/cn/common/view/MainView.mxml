@@ -16,6 +16,7 @@
 			import com.promise.cn.moneyconsume.view.MoneyConsumeManagerView;
 			import com.promise.cn.plan.view.DayPlanManagerView;
 			import com.promise.cn.plan.view.PlanManagerView;
+			import com.promise.cn.work.view.WorkLogManagerView;
 			
 			import mx.core.IVisualElement;
 			import mx.events.EffectEvent;
@@ -73,6 +74,8 @@
 					return new DataManagerView();
 				}else if(url=="dayPlanManager"){
 					return new DayPlanManagerView();
+				}else if(url=="workLogManager"){
+					return new WorkLogManagerView();
 				}else{
 					return null;
 				}

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.vo.QueryObject;
+			import com.promise.cn.work.vo.WorkLog;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"编号",dataField:"id",width:'150'},
+				{headerText:"工作人",dataField:"workName",width:'100'},
+				{headerText:"时间",dataField:"timeStr",width:'150'},
+				{headerText:"工作量",dataField:"workHour",width:'100'},
+				{headerText:"内容",dataField:"content",width:'300'}
+				];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"增加",uri:"addWorkLog",icon:Icons.addIcon},
+				{label:"修改",uri:"editWorkLog",icon:Icons.editIcon},
+				{label:"删除",uri:"removeWorkLog",icon:Icons.removeIcon},
+				]
+			
+			private var workLogService:RemoteObject;
+			private var workLogServiceDelete:RemoteObject;
+			private var workLogServiceUpdate:RemoteObject;
+				
+			//初始化方法
+			public function init():void{
+				workLogService = Global.getRemoteObject("workLogService",workLogServiceHandle);
+				workLogServiceDelete = Global.getRemoteObject("workLogService",workLogServiceDeleteHandle);
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "workName";
+				valueObject1.value = Global.pbUser.name;
+				valueObject1.queryType = "0";
+				valueList.push(valueObject1);
+				workLogService.getAllWorkLog(valueList,1,20);
+				workLogServiceUpdate = Global.getRemoteObject("workLogService",workLogServiceUpdateHandle);
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'addWorkLog':
+						addWorkLog();
+						break;
+					case 'editWorkLog':
+						editWorkLog();
+						break;
+					case 'removeWorkLog':
+						removeWorkLog();
+						break;
+				}
+			}
+			
+			
+			//修改成功
+			public function workLogServiceUpdateHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("工作日志更新成功！","系统提示");
+			}
+			
+			//查询面板
+			public function searchWorkLog():void{
+				var searchWorkLog:SearchWorkLog = new SearchWorkLog();
+				searchWorkLog.addEventListener(PBConstant.APP_WORKLOGSEARCH,searchSuccessHandle);
+				PopUpManager.addPopUp(searchWorkLog,this,true);
+				Global.centerPopUpPos(searchWorkLog);
+			}
+			//查询成功
+			public function searchSuccessHandle(event:AppEvent):void{
+				pageGrid.setList(event.data);
+			}
+			
+			//增加面板
+			public function addWorkLog():void{
+				var addWorkLog:AddWorkLog = new AddWorkLog();
+				addWorkLog.addEventListener(PBConstant.APP_WORKLOGTITLEWINDOW,addWorkLogSuccess);
+				PopUpManager.addPopUp(addWorkLog,this,true);
+				Global.centerPopUpPos(addWorkLog);
+			}
+			
+			public function removeWorkLog():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定要删除该信息吗？","系统提示",3,null,delHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择一条工作日志记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					workLogServiceDelete.deleteWorkLog(pageGrid.selectedItem.id);
+				}
+			}
+			
+			public function workLogServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("工作日志删除成功！","系统提示");
+			}
+			
+			public function addWorkLogSuccess(event:AppEvent):void{
+				refresh(event);
+			}
+			
+			//编辑面板
+			public function editWorkLog():void{
+				if(null!=pageGrid.selectedItem){
+					var workLog:WorkLog = pageGrid.selectedItem as WorkLog;
+					var editWorkLog:EditWorkLog = new EditWorkLog();
+					editWorkLog.addEventListener(PBConstant.APP_WORKLOGTITLEWINDOW,addWorkLogSuccess);
+					editWorkLog.workLog = workLog;
+					PopUpManager.addPopUp(editWorkLog,this,true);
+					Global.centerPopUpPos(editWorkLog);
+				}else{
+					Alert.show("请选择一条工作日志进行修改！","系统提示");
+				}
+			}
+			
+			//查询工作日志成功
+			public function workLogServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "workName";
+				valueObject1.value = Global.pbUser.name;
+				valueObject1.queryType = "0";
+				valueList.push(valueObject1);
+				workLogService.getAllWorkLog(valueList,pageGrid.pageNo,pageGrid.pageSize);
+			}
+			
+			protected function pbt_enterHandler(event:FlexEvent):void
+			{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+			}
+			
+		]]>
+	</fx:Script>
+	<s:HGroup width="100%"  verticalAlign="middle">
+		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" />
+		<s:Spacer width="10" />
+	</s:HGroup>
+	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+</s:VGroup>

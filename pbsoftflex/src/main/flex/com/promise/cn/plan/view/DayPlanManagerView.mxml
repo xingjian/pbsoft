@@ -73,7 +73,7 @@
 				valueObject1.value = Global.pbUser.name;
 				valueObject1.queryType = "0";
 				valueList.push(valueObject1);
-				dayPlanService.getDayPlanPageSupport(valueList,1,20);
+				dayPlanService.getDayPlanPageSupport(valueList,1,50);
 				dayPlanServiceUpdate = Global.getRemoteObject("dayPlanService",dayPlanServiceUpdateHandle);
 			}
 			

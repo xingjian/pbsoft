@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" title="修改工作日志" titleIcon="{Icons.editIcon}"
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="412" height="335" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.work.vo.WorkLog;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			private var workLogService:RemoteObject;
+			[Bindable]
+			public var workLog:WorkLog;
+			
+			//初始化方法
+			public function init():void{
+				workLogService = Global.getRemoteObject("workLogService",workLogServiceHandle);
+				workContentText.text = workLog.content;
+				remarkText.text = workLog.remark;
+				workTimeText.text = workLog.timeStr;
+				workNameText.text = workLog.workName;
+				ns.value = workLog.workHour;
+			}
+			
+			//保存成功
+			private function workLogServiceHandle(evnet:ResultEvent):void{
+				Alert.show("修改工作日志成功！","系统提示");
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_WORKLOGTITLEWINDOW,"success");
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//重置
+			public function resetBtnClick():void{
+				workContentText.text = workLog.content;
+				remarkText.text = workLog.remark;
+				workTimeText.text = workLog.timeStr;
+			}
+			//提交
+			public function submitBtnClick():void{
+				workLog.content = workContentText.text;
+				workLog.remark = remarkText.text;
+				workLog.timeStr = workTimeText.text;
+				workLog.workHour = ns.value;
+				workLog.workName = workNameText.text;
+				workLogService.updateWorkLog(workLog);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" gap="10">
+		<s:Spacer width="5" />
+		<s:HGroup verticalAlign="middle" horizontalAlign="center">
+			<s:Spacer width="5" />
+			<s:Label  width="60" height="23" text="工作时间：" verticalAlign="middle"/>
+			<mx:DateField id="workTimeText"  selectedDate="{new Date()}" width="125" yearNavigationEnabled="true" formatString="YYYY-MM-DD" />
+			<s:Label  height="22" text="工作人员：" verticalAlign="middle"/>
+			<s:TextInput id="workNameText" width="125"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle" horizontalAlign="center">
+			<s:Spacer width="5" />
+			<s:Label  width="60" height="23" text="工作量 ：" verticalAlign="middle"/>
+			<s:NumericStepper id="ns"  width="54" maximum="24" />
+		</s:HGroup>
+		<s:HGroup width="100%">
+			<s:Spacer width="5" />
+			<s:Label text="工作内容：" height="{workContentText.height}" textAlign="center" verticalAlign="middle"/>
+			<s:TextArea id="workContentText"  width="95%" height="100%"/>
+			<s:Spacer width="5" />
+		</s:HGroup>
+		<s:HGroup width="100%" gap="10">
+			<s:Spacer width="5" />
+			<s:Label  text="备  注  ：" height="{remarkText.height}" textAlign="center" verticalAlign="middle" />
+			<s:TextInput id="remarkText" width="100%"/>
+			<s:Spacer width="5" />
+		</s:HGroup>
+		<s:HGroup width="100%" horizontalAlign="center" gap="20">
+			<s:Button id="saveBtn" label="提交" click="submitBtnClick()"/>
+			<s:Button label="重置" click="resetBtnClick()"/>
+			<s:Button label="关闭" click="closeWindow()"/>
+		</s:HGroup>
+	</s:VGroup>
+</views:PBTitleWindow>

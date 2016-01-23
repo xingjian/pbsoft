@@ -7,8 +7,6 @@
  **/
 package com.promise.cn.framework.util
 {
-	import mx.controls.Alert;
-	import mx.controls.DateField;
 	import mx.formatters.DateFormatter;
 	import mx.utils.ObjectUtil;
 	
@@ -54,7 +52,7 @@ package com.promise.cn.framework.util
 		//字符串变成日期MM-DD-YYYY
 		public static function StringToDate(date:String):Date{
 			var dateArray:Array = date.split("-");
-			return new Date(dateArray[2],dateArray[0]-1,dateArray[1]);
+			return new Date(dateArray[0],dateArray[1]-1,dateArray[2]);
 		}
 		
 		//日期做比较

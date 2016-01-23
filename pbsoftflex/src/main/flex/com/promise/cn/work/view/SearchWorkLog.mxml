@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
+			   xmlns:s="library://ns.adobe.com/flex/spark" title="查询任务计划" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="272">
+	<fx:Declarations>
+		<s:RadioButtonGroup id="radiogroup"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.vo.QueryObject;
+			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			private var taskRecordService:RemoteObject;
+			private var dictContentServiceSearch:RemoteObject;
+			[Bindable]
+			private var planTypeCBData:ArrayCollection;
+			
+			//初始化方法
+			public function init():void{
+				taskRecordService = Global.getRemoteObject("taskRecordService",searchHandle);
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.PLANTYPE);
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				planTypeCBData = dictContentList;
+				//设置默认选择第一个
+				if(null!=planTypeCBData&&planTypeCBData.length>0){
+					var object:Object = {id:"all",name:"全部"};
+					planTypeCBData.addItemAt(object,0);
+					consumeCB.selectedIndex = 0;
+				}
+			}
+			
+			//任务查询成功
+			public function searchHandle(event:ResultEvent):void{
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_PLANSEARCH,event);
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			//重置
+			protected function resetBtnClickHandle(event:MouseEvent):void{
+				taskNameText.text = "";
+			}
+			//开始查询
+			public function okBtnClickHandle(event:MouseEvent):void{
+				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "createDate";
+				valueObject1.value = startDF.text;
+				valueObject1.queryType = "2";
+				valueList.push(valueObject1);
+				var valueObject2:QueryObject = new QueryObject();//结束时间
+				valueObject2.key = "createDate";
+				valueObject2.value = endDF.text;
+				valueObject2.queryType = "3";
+				valueList.push(valueObject2);
+				if(consumeCB.selectedIndex>0){//任务类型
+					var dictContent:DictContent = consumeCB.selectedItem as DictContent;
+					var valueObject3:QueryObject = new QueryObject();
+					valueObject3.key = "taskType.id";
+					valueObject3.value = dictContent.id;
+					valueObject3.queryType = "0";
+					valueList.push(valueObject3);
+				}
+				if(taskNameText.text!=""){//任务名称
+					var valueObject4:QueryObject = new QueryObject();
+					valueObject4.key = "name";
+					valueObject4.value = taskNameText.text;
+					valueObject4.queryType = "1";
+					valueList.push(valueObject4);
+				}
+				
+				if(textArea.text!=""){//任务名称
+					var valueObject5:QueryObject = new QueryObject();
+					valueObject5.key = "content";
+					valueObject5.value = textArea.text;
+					valueObject5.queryType = "1";
+					valueList.push(valueObject5);
+				}
+				var active:String = radiogroup.selectedValue.toString();
+				var valueObject6:QueryObject = new QueryObject();
+				valueObject6.key = "activate";
+				valueObject6.value = active;
+				valueObject6.queryType = "0";
+				valueList.push(valueObject6);
+				taskRecordService.getTaskRecordPageSupport(valueList,1,200);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Label x="15" y="14" text="任务名称："/>
+	<s:TextInput x="83" y="10" width="249" id="taskNameText"/>
+	<s:Button x="23" y="208" label="确定" click="okBtnClickHandle(event)" />
+	<s:Button x="142" y="208" label="重置" click="resetBtnClickHandle(event)"/>
+	<s:Button x="255" y="208" label="关闭" click="closeWindow(event)"/>
+	<s:Label x="15" y="50" text="创建时间："/>
+	<mx:DateField x="83" y="45" width="108" id="startDF" />
+	<s:Label x="200" y="49" text="到"/>
+	<mx:DateField x="228" y="45" width="104" id="endDF" />
+	<s:Label x="15" y="82" text="任务类型："/>
+	<s:ComboBox x="83" id="consumeCB" y="76" dataProvider="{planTypeCBData}" width="108"/>
+	<s:HGroup x="221" y="79" width="110">
+		<s:RadioButton width="47" label="完成" groupName="radiogroup" value="1"/>
+		<s:RadioButton width="86" label="未完成" groupName="radiogroup" value="0"/>
+	</s:HGroup>
+	<s:Label x="15" y="111" text="任务描述："/>
+	<s:TextArea x="16" y="134" id="textArea" width="315" height="55"/>
+</s:TitleWindow>

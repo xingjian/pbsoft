@@ -46,7 +46,8 @@ public class Icons
 	
 	[Embed(source="../../../../../com/promise/cn/images/root.gif")]
 	public static const root:Class;//计划激活
-	
+	[Embed(source="../../../../../com/promise/cn/images/worklogmanager.png")]
+	public static const workLogManager:Class;//用户管理
 	
 	public function Icons()
 	{
