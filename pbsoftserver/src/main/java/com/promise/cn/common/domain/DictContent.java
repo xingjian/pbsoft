@@ -33,7 +33,7 @@ import org.hibernate.annotations.GenericGenerator;
 })
 @SuppressWarnings("all")
 @Entity
-@Table(name = "DictContent")
+@Table(name = "dictcontent")
 public class DictContent implements Serializable {
 	private String id;
 	private Dict dict;

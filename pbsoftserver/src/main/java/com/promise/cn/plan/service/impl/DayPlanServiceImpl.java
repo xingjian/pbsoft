@@ -78,7 +78,7 @@ public class DayPlanServiceImpl implements DayPlanService {
 		if(null!=valueObject&&valueObject.size()>0){//带条件查询
 			sql = sql + " "+QueryObject.creatSql(valueObject);
 		}
-		sql = sql + " order by t.createDate desc";
+		sql = sql + " order by t.pass, t.createDate desc";
 		return queryManager.find(sql, pageNo, pageSize);
 	}
 
