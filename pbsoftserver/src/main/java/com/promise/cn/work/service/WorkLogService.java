@@ -56,4 +56,6 @@ public interface WorkLogService {
 	 * @return
 	 */
 	public PageSupport getAllWorkLog(List<QueryObject> valueObject,int pageNo,int pageSize);
+	
+	public PageSupport getWorkLogBySQL(String sql,int pageNo,int pageSize);
 }

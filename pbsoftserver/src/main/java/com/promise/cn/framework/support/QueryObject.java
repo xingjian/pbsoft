@@ -81,6 +81,25 @@ public class QueryObject {
                         }else if("6".equals(queryType)){
                             sql.append(" or "+key+" not in ("+value+")");
                         }
+                    }else if("null".equalsIgnoreCase(andOr)){
+                    	if("0".equals(queryType)){
+                            sql.append(" " + key + "='" + value + "'");
+                        }else if("1".equals(queryType)){
+                            sql.append(" " + key + " like '%" + value + "%'");
+                        }
+                        else if("2".equals(queryType)){
+                            sql.append(" "+key+">='"+value+"'");
+                        }
+                        else if("3".equals(queryType)){
+                            sql.append(" "+key+"<='"+value+"'");
+                        }
+                        else if("4".equals(queryType)){
+                            sql.append(" "+key+" like '"+value+"%'");
+                        }else if("5".equals(queryType)){
+                            sql.append(" "+key+" in ("+value+")");
+                        }else if("6".equals(queryType)){
+                            sql.append(" "+key+" not in ("+value+")");
+                        }
                     }else{
                         if("0".equals(queryType)){
                             sql.append(" and " + key + "='" + value + "'");

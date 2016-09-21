@@ -96,4 +96,11 @@ public class WorkLogServiceImpl implements WorkLogService {
 		sql = sql + " order by t.timeStr desc";
 		return queryManager.find(sql, pageNo, pageSize);
 	}
+	
+	
+	@Override
+	@RemotingInclude
+	public PageSupport getWorkLogBySQL(String hql,int pageNo,int pageSize){
+		return queryManager.find(hql, pageNo, pageSize);
+	}
 }
