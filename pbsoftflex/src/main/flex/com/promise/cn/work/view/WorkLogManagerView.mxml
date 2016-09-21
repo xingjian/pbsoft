@@ -7,6 +7,7 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.promise.cn.common.vo.DictContent;
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
@@ -43,13 +44,7 @@
 			public function init():void{
 				workLogService = Global.getRemoteObject("workLogService",workLogServiceHandle);
 				workLogServiceDelete = Global.getRemoteObject("workLogService",workLogServiceDeleteHandle);
-				var valueList:Array=new Array();
-				var valueObject1:QueryObject = new QueryObject();//开始时间
-				valueObject1.key = "workName";
-				valueObject1.value = Global.pbUser.name;
-				valueObject1.queryType = "0";
-				valueList.push(valueObject1);
-				workLogService.getAllWorkLog(valueList,1,20);
+				refresh(null);
 				workLogServiceUpdate = Global.getRemoteObject("workLogService",workLogServiceUpdateHandle);
 			}
 			
@@ -141,24 +136,24 @@
 			//刷新
 			public function refresh(event:AppEvent):void{
 				var valueList:Array=new Array();
-				var valueObject1:QueryObject = new QueryObject();//开始时间
-				valueObject1.key = "workName";
-				valueObject1.value = Global.pbUser.name;
-				valueObject1.queryType = "0";
-				valueList.push(valueObject1);
-				workLogService.getAllWorkLog(valueList,pageGrid.pageNo,pageGrid.pageSize);
+				if(null==pbt.text||pbt.text==''){
+					workLogService.getAllWorkLog(null,pageGrid.pageNo,pageGrid.pageSize);
+				}else{
+					var hql:String = "from WorkLog t where 1=1 and (workName like '%"+pbt.text+"%' or content like '%"+pbt.text+"%') order by timeStr desc";
+					workLogService.getWorkLogBySQL(hql,1,pageGrid.pageSize);
+				}
 			}
 			
 			protected function pbt_enterHandler(event:FlexEvent):void
 			{
-				//获取查询对象集合 0等值查询 1模糊查询  2大于查询 3小于查询  5是in查询  6是not in查询
+				refresh(null);
 			}
 			
 		]]>
 	</fx:Script>
 	<s:HGroup width="100%"  verticalAlign="middle">
 		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
-		<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" />
+		<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" toolTip="根据人员和日志内容检索！" />
 		<s:Spacer width="10" />
 	</s:HGroup>
 	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>

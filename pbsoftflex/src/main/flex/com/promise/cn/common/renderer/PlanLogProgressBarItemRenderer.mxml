@@ -12,7 +12,7 @@
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
-			import mx.controls.Alert;
+			
 			
 			override public function set data( value:Object) : void {  
 				super.data = value;  

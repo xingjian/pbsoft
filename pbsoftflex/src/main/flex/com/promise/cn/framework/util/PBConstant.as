@@ -29,7 +29,7 @@ package com.promise.cn.framework.util
 		public static const APP_PLANSEARCH:String = "appPlanSearch";
 		public static const APP_WORKLOGSEARCH:String = "appWorkLogSearch";
 		public static const APP_ICONLABEL_CLICK:String = "appIconLabelClick";
-		
+		public static const APP_PROJECTTASKTITLEWINDOW:String = "freshProjectTask";
 		//常用数字大小
 		//屏幕宽度
 		public static const SREENWIDTH:int = 1280;

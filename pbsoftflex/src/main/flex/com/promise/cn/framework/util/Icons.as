@@ -48,7 +48,10 @@ public class Icons
 	public static const root:Class;//计划激活
 	[Embed(source="../../../../../com/promise/cn/images/worklogmanager.png")]
 	public static const workLogManager:Class;//用户管理
-	
+	[Embed(source="../../../../../com/promise/cn/images/projectmanager.png")]
+	public static const projectManager:Class;//用户管理
+	[Embed(source="../../../../../com/promise/cn/images/add_project.png")]
+	public static const addProject:Class;//增加
 	public function Icons()
 	{
 	}

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" close="closeWindow()"
+					 xmlns:s="library://ns.adobe.com/flex/spark" title="增加项目任务计划" titleIcon="{Icons.addIcon}"
+					 xmlns:mx="library://ns.adobe.com/flex/mx" width="650" height="430" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+		<s:RadioButtonGroup id="radiogroup_active"/>
+		<s:RadioButtonGroup id="radiogroup_level"/>
+		<fx:Array id="validators">
+			<mx:StringValidator id="planNumValidator" trigger="{saveBtn}" source="{projectTaskNameTI}" property="text" required="true" requiredFieldError="项目任务名称不能为空！" />
+		</fx:Array>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.DictConstant;
+			import com.promise.cn.common.vo.DictContent;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.project.vo.ProjectTask;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			import mx.validators.Validator;
+			
+			private var projectTaskService:RemoteObject;
+			[Bindable]
+			private var projectNameCBData:ArrayCollection;
+			private var dictContentServiceSearch:RemoteObject;
+			
+			//init method
+			public function init():void{
+				dictContentServiceSearch = Global.getRemoteObject("dictService",dictContentServiceSearchHandle);
+				projectTaskService = Global.getRemoteObject("projectManagerService",projectTaskServiceHandle);
+				dictContentServiceSearch.listDictContent(DictConstant.PROJECTTYPE);
+			}
+			
+			public function projectTaskServiceHandle(event:ResultEvent):void{
+				Alert.show("提交项目任务成功！","系统提示");
+				var appEvent:AppEvent = new AppEvent(PBConstant.APP_PROJECTTASKTITLEWINDOW,"success");
+				this.dispatchEvent(appEvent);
+				closeWindow();
+			}
+			
+			//查询字典内容成功
+			public function dictContentServiceSearchHandle(event:ResultEvent):void{
+				var dictContentList:ArrayCollection = event.result as ArrayCollection;
+				projectNameCBData = dictContentList;
+				//设置默认选择第一个
+				if(null!=projectNameCBData&&projectNameCBData.length>0){
+					projectNameCB.selectedIndex = 0;
+				}
+			}
+			
+			public function closeWindow():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//提交
+			public function submitBtnClick():void{
+				var validatorErrorArray:Array = Validator.validateAll(validators);
+				var isValidForm:Boolean = validatorErrorArray.length == 0;
+				if(isValidForm){
+					var pt:ProjectTask = new ProjectTask();
+					pt.createUser = Global.pbUser.name;
+					pt.project = projectNameCB.selectedItem as DictContent;
+					pt.taskName = projectTaskNameTI.text;
+					var active:String = radiogroup_active.selectedValue.toString();
+					var level:String = radiogroup_level.selectedValue.toString();
+					pt.activate = active;
+					if(active=="1"){
+						pt.activateDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+					}	
+					pt.level = Number(level);	
+					pt.startDate = startDF.text;
+					pt.endDate = endDF.text;
+					pt.pass = "0";
+					pt.currentValue="0";
+					pt.executeUser = executeUserTI.text;
+					pt.taskContent = projectTaskTextArea.text;
+					projectTaskService.addProjectTask(pt);
+				}
+				
+			}
+			
+			//重置
+			public function resetBtnClick():void{
+				projectTaskNameTI.text="";
+				executeUserTI.text = "";
+				projectTaskTextArea.text = "";
+				radiogroup_active.selectedValue = "0";
+				radiogroup_level.selectedValue = "1";
+				startDF.selectedDate = new Date();
+				endDF.selectedDate = new Date();
+				if(null!=projectNameCB&&projectNameCBData.length>0){
+					projectNameCB.selectedIndex = 0;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" gap="-20">
+		<s:Form width="100%">
+			<s:FormItem label="任务名称：">
+				<s:TextInput id="projectTaskNameTI" width="100%" />
+			</s:FormItem>
+		</s:Form>
+		<s:HGroup width="100%">
+			<s:Form width="50%">
+				<s:FormItem label="项目名称：" >
+					<s:ComboBox id="projectNameCB" labelField="name" dataProvider="{projectNameCBData}" width="200"/>
+				</s:FormItem>
+				<s:FormItem label="开始时间：" >
+					<mx:DateField id="startDF"  selectedDate="{new Date()}" width="200" yearNavigationEnabled="true" formatString="YYYY-MM-DD" />
+				</s:FormItem>
+				<s:FormItem label="是否激活：" >
+					<s:HGroup width="200" gap="30" height="23" verticalAlign="middle" horizontalAlign="left">
+						<s:RadioButton label="激活" value="1" groupName="radiogroup_active" selected="false"/>
+						<s:RadioButton label="不激活" value="0" groupName="radiogroup_active" selected="true"/>
+					</s:HGroup>
+				</s:FormItem>
+			</s:Form>
+			<s:Form width="50%">
+				<s:FormItem label="执行人：">
+					<s:TextInput id="executeUserTI" width="200" />
+				</s:FormItem>
+				<s:FormItem label="结束时间：" >
+					<mx:DateField id="endDF" selectedDate="{new Date()}" width="200" yearNavigationEnabled="true" formatString="YYYY-MM-DD" />
+				</s:FormItem>
+				<s:FormItem label="重 要 性：">
+					<s:HGroup  width="200" gap="30" verticalAlign="middle" horizontalAlign="left">
+						<s:RadioButton label="正常" value="1" groupName="radiogroup_level" selected="true"/>
+						<s:RadioButton label="紧急" value="2" groupName="radiogroup_level" selected="false"/>
+					</s:HGroup>
+				</s:FormItem>
+			</s:Form>
+		</s:HGroup>
+		<s:Form width="100%">
+			<s:FormItem label="任务内容：">
+				<s:TextArea id="projectTaskTextArea" width="100%" height="150" />
+			</s:FormItem>
+		</s:Form>
+		<s:HGroup width="100%" horizontalAlign="center" height="40" gap="30" verticalAlign="bottom">
+			<s:Button id="saveBtn" label="提交" click="submitBtnClick()"/>
+			<s:Button label="重置" click="resetBtnClick()" />
+			<s:Button label="关闭" click="closeWindow()" />
+		</s:HGroup>
+	</s:VGroup>
+</views:PBTitleWindow>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:PBTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" title="增加项目任务日志"
+					 xmlns:s="library://ns.adobe.com/flex/spark" close="closeWindow(event)" titleIcon="{Icons.addIcon}"
+					 xmlns:mx="library://ns.adobe.com/flex/mx" width="476" height="280" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+	</fx:Declarations>
+		<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		.redBar{
+			bar-color:#00ff00;			
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.project.vo.ProjectTask;
+			import com.promise.cn.project.vo.ProjectTaskLog;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var projectTask:ProjectTask;
+			public var projectTaskService:RemoteObject;
+			
+			public function init():void{
+				projectTaskService = Global.getRemoteObject("projectManagerService",projectTaskServiceHandle);
+				ns.value = Number(projectTask.currentValue);
+				pb.setProgress(Number(projectTask.currentValue),100);
+				pb.label = "当前进度: "+ns.value+"%";
+			}
+			
+			//保存成功
+			public function projectTaskServiceHandle(event:ResultEvent):void{
+				dispatchEvent(new AppEvent("saveSuccess"));
+				closeWindow();
+				Alert.show("项目任务记录添加成功，请努力加油","系统提示");
+			}
+			
+			//关闭窗口
+			public function closeWindow(event:Event=null):void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			//修改
+			protected function ns_changeHandler(event:Event):void{
+				pb.setProgress(ns.value,100);
+				pb.label = "当前进度: "+ns.value+"%";
+			}
+			
+			//增加日志
+			protected function btnCommitHandle(event:MouseEvent):void{
+				var taskLog:ProjectTaskLog = new ProjectTaskLog();
+				taskLog.createDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS ",new Date());
+				taskLog.remark = remarkText.text;
+				taskLog.value = String(pb.value);
+				taskLog.projectTask = this.projectTask;
+				projectTaskService.addProjectTaskLog(taskLog);
+			}
+			
+			//重置按钮
+			protected function resetBtnClickHandle(event:MouseEvent):void{
+				remarkText.text = "";
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%">
+		<s:Form width="100%">
+			<s:FormItem label="任务名称：">
+				<s:TextInput id="taskNameText" width="100%" text="{projectTask.taskName}" editable="false"/>
+			</s:FormItem>
+			<s:FormItem label="任务进度：">
+				<s:HGroup width="100%">
+					<mx:ProgressBar id="pb" width="100%"  labelPlacement="center" mode="manual" barSkin="com.promise.cn.common.skin.ProgressBarSkin" styleName="redBar" color="#0000FF"/>
+					<s:NumericStepper id="ns"  width="54" maximum="100" change="ns_changeHandler(event)"/>
+				</s:HGroup>
+			</s:FormItem>
+			<s:FormItem label="任务记录：">
+				<s:TextArea id="remarkText" width="100%" height="66"/>
+			</s:FormItem>
+		</s:Form>
+		<s:HGroup horizontalAlign="center" gap="30" width="100%">
+			<s:Button x="50" y="196" label="提交" click="btnCommitHandle(event)"/>
+			<s:Button x="160" y="196" label="重置" click="resetBtnClickHandle(event)"/>
+			<s:Button x="271" y="196" label="关闭" click="closeWindow(event)"/>
+		</s:HGroup>
+	</s:VGroup>
+</views:PBTitleWindow>
+

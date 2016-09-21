@@ -11,5 +11,6 @@ package com.promise.cn.common
 	{
 		public static const CONSUMETYPE:String = "consumeType";//消费类型
 		public static const PLANTYPE:String = "planType";
+		public static const PROJECTTYPE:String = "projectName";
 	}
 }

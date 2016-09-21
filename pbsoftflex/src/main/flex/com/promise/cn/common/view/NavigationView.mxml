@@ -26,6 +26,7 @@
 					{label:"用户管理",uri:"userManager",icon:Icons.userManager},
 					{label:"菜单管理",uri:"menuManager",icon:Icons.menuManager},
 					{label:"字典管理",uri:"dictManager",icon:Icons.dict},
+					{label:"项目管理",uri:"projectManager",icon:Icons.projectManager},
 					{label:"学习计划",uri:"planManager",icon:Icons.plan},
 					{label:"待办事项",uri:"dayPlanManager",icon:Icons.dayPlan},
 					{label:"消费管理",uri:"moneyconsumeManager",icon:Icons.moneyconsume},

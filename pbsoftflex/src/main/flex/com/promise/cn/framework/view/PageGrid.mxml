@@ -68,6 +68,10 @@
 					if(obj.itemRenderer != undefined){
 						col.itemRenderer = obj.itemRenderer;
 					}
+					if(obj.tooltip != undefined){
+						col.dataTipField = col.dataField;
+						col.showDataTips = true;
+					}
 					this.columns.push(col);
 				}
 				this.dataGrid.columns = this.columns;

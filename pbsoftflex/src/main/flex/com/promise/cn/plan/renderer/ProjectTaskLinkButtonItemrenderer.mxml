@@ -7,14 +7,14 @@
 	<fx:Script>
 		<![CDATA[
 			import com.promise.cn.framework.util.Global;
-			import com.promise.cn.plan.view.PlanLogView;
+			import com.promise.cn.project.view.ProjectTaskLogView;
+			import com.promise.cn.project.vo.ProjectTask;
 			
 			import mx.managers.PopUpManager;
 			protected function clickHandler(event:MouseEvent):void{
-				var planID:String = data.id;
-				var plv:PlanLogView = new PlanLogView();
-				plv.title = data.name;
-				plv.taskRecordID = planID;
+				var plv:ProjectTaskLogView = new ProjectTaskLogView();
+				//plv.title = data.projectTask.name +"日志相关记录";
+				plv.projectTask = data as ProjectTask;
 				PopUpManager.addPopUp(plv,this,true);
 				Global.centerPopUpPos(plv);
 			}

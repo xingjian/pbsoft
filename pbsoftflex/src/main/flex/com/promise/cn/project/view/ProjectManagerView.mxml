@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:view="com.promise.cn.framework.view.*" xmlns:views="com.promise.cn.views.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.promise.cn.common.renderer.ProgressBarItemRenderer;
+			import com.promise.cn.framework.event.AppEvent;
+			import com.promise.cn.framework.util.Global;
+			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.framework.util.PBConstant;
+			import com.promise.cn.framework.util.PBUtil;
+			import com.promise.cn.plan.renderer.ProjectTaskLinkButtonItemrenderer;
+			import com.promise.cn.project.renderer.ProjectTaskLevelRenderer;
+			import com.promise.cn.project.renderer.ProjectTaskRealEndDateRenderer;
+			import com.promise.cn.project.vo.ProjectTask;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.mxml.RemoteObject;
+			
+			[Bindable]
+			public var header:Array =  [{headerText:"项目名称",dataField:"project.name",width:'150'},
+				{headerText:"任务名称",dataField:"taskName",width:'150',tooltip:true},
+				{headerText:"重要性",dataField:"levelStr",width:'80',itemRenderer:new ClassFactory(ProjectTaskLevelRenderer)},
+				{headerText:"计划开始时间",dataField:"startDate",width:'100'},
+				{headerText:"计划结束时间",dataField:"endDate",width:'100'},
+				{headerText:"当前进度",dataField:"currentValue",width:'180',itemRenderer:new ClassFactory(ProgressBarItemRenderer)},
+				{headerText:"负责人",dataField:"createUser",width:'80'},
+				{headerText:"执行人",dataField:"executeUser",width:'80'},
+				{headerText:"是否激活",dataField:"activateToString"},
+				{headerText:"激活时间",dataField:"activateDateToString",width:'120'},
+				{headerText:"结束时间",dataField:"realEndDate",width:'120',itemRenderer:new ClassFactory(ProjectTaskRealEndDateRenderer)},
+				{headerText:"操作",dataField:"id",width:'100',itemRenderer:new ClassFactory(ProjectTaskLinkButtonItemrenderer)},
+				{headerText:"内容",dataField:"taskContent"},
+			];
+			
+			[Bindable]
+			private var linkButtons:Array = [{label:"增加",uri:"addProjectTask",icon:Icons.addIcon},
+				{label:"修改",uri:"editProjectTask",icon:Icons.editIcon},
+				{label:"删除",uri:"removeProjectTask",icon:Icons.removeIcon},
+				{label:"激活任务",uri:"activeProjectTask",icon:Icons.planactive},
+				{label:"结束任务",uri:"passProjectTask",icon:Icons.planend},
+				{label:"添加任务日志",uri:"appendProjectTaskLog",icon:Icons.planappend}
+			]
+			
+			private var projectTaskService:RemoteObject;
+			private var projectTaskServiceDelete:RemoteObject;
+			private var projectTaskServiceUpdate:RemoteObject
+			
+			//初始化方法
+			public function init():void{
+				projectTaskService = Global.getRemoteObject("projectManagerService",projectTaskServiceHandle);
+				projectTaskServiceDelete = Global.getRemoteObject("projectManagerService",projectTaskServiceDeleteHandle);
+				projectTaskServiceUpdate = Global.getRemoteObject("projectManagerService",projectTaskServiceUpdateHandle);
+				refresh(null);
+			}
+			
+			//linkBarClick事件
+			public function linkBarClick(event:AppEvent):void{
+				var uri:String = event.data.uri;
+				switch(uri){
+					case 'addProjectTask':
+						addProjectTask();
+						break;
+					case 'editProjectTask':
+						editProjectTask();
+						break;
+					case 'removeProjectTask':
+						removeProjectTask();
+						break;
+					case 'activeProjectTask':
+						activeProjectTask();
+						break;
+					case 'passProjectTask':
+						passProjectTask();
+						break;
+					case 'appendProjectTaskLog':
+						appendProjectTaskLog();
+						break;
+				}
+			}
+			
+			//添加任务记录
+			public function appendProjectTaskLog():void{
+				if(null!=pageGrid.selectedItem){
+					var pt:ProjectTask = pageGrid.selectedItem as ProjectTask;
+					if(pt.pass=="0"){
+						var addPTLog:AddProjectTaskLog = new AddProjectTaskLog();
+						addPTLog.addEventListener("saveSuccess",refresh);
+						addPTLog.projectTask = pt;
+						PopUpManager.addPopUp(addPTLog,this,true);
+						Global.centerPopUpPos(addPTLog);
+					}else{
+						Alert.show("该项目任务已经在"+pt.realEndDate+"结束了,不能添加项目任务日志！","系统提示");	
+					}
+				}else{
+					Alert.show("请选择一条项目任务记录！","系统提示");
+				}
+			}
+			
+			//激活
+			public function activeProjectTask():void{
+				if(null!=pageGrid.selectedItem){
+					var pt:ProjectTask = pageGrid.selectedItem as ProjectTask;
+					if(pt.pass=="0"){
+						if(pt.activate == "1"){
+							Alert.show("该项目任务已经在"+pt.activateDate+"激活成功,不能重复激活工作任务！","系统提示");
+						}else{
+							pt.activate = "1";
+							pt.activateDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+							projectTaskServiceUpdate.updateProjectTask(pt);
+						}
+					}else{
+						Alert.show("该项目任务已经在"+pt.realEndDate+"结束了,不能激活工作任务！","系统提示");	
+					}
+				}else{
+					Alert.show("请选择一条项目任务记录！","系统提示");
+				}
+			}
+			//结束
+			public function passProjectTask():void{
+				if(null!=pageGrid.selectedItem){
+					var pt:ProjectTask = pageGrid.selectedItem as ProjectTask;
+					if(pt.pass=="0"){
+						Alert.show("确定要结束该项目任务计划？","系统提示",3,null,endProjectTaskHandler,null,Alert.NO);
+					}else{
+						Alert.show("该项目任务计划已经在"+pt.realEndDate+"结束了！","系统提示");					
+					}
+				}else{
+					Alert.show("请选择一条项目任务记录！","系统提示");
+				}
+			}
+			
+			public function endProjectTaskHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					var pt:ProjectTask = pageGrid.selectedItem as ProjectTask;
+					pt.pass = "1";
+					pt.realEndDate = PBUtil.DateToString("YYYY-MM-DD JJ:NN:SS",new Date());
+					projectTaskServiceUpdate.updateProjectTask(pt);
+				}
+			}
+			
+			//修改成功
+			public function projectTaskServiceUpdateHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("任务更新成功！","系统提示");
+			}
+			
+			//查询面板
+			public function searchRecord():void{
+//				var searchPlan:SearchPlan = new SearchPlan();
+//				searchPlan.addEventListener(PBConstant.APP_PLANSEARCH,searchSuccessHandle);
+//				PopUpManager.addPopUp(searchPlan,this,true);
+//				Global.centerPopUpPos(searchPlan);
+			}
+			//查询成功
+			public function searchSuccessHandle(event:AppEvent):void{
+				pageGrid.setList(event.data);
+			}
+			
+			//增加面板
+			public function addProjectTask():void{
+				var addProjectTask:AddProjectTask = new AddProjectTask();
+				addProjectTask.addEventListener(PBConstant.APP_PROJECTTASKTITLEWINDOW,addProjectTaskSuccess);
+				PopUpManager.addPopUp(addProjectTask,this,true);
+				Global.centerPopUpPos(addProjectTask);
+			}
+			
+			public function removeProjectTask():void{
+				if(null!=pageGrid.selectedItem){
+					Alert.show("确定要删除该信息吗？","系统提示",3,null,delHandler,null,Alert.NO);
+				}else{
+					Alert.show("请选择一条任务记录！","系统提示");
+				}
+			}
+			
+			public function delHandler(event:CloseEvent):void{
+				if(event.detail==Alert.YES){
+					projectTaskServiceDelete.deleteProjectTask(pageGrid.selectedItem.id);
+				}
+			}
+			
+			public function projectTaskServiceDeleteHandle(event:ResultEvent):void{
+				refresh(null);
+				Alert.show("任务计划删除成功！","系统提示");
+			}
+			
+			public function addProjectTaskSuccess(event:AppEvent):void{
+				refresh(event);
+			}
+			
+			//编辑面板
+			public function editProjectTask():void{
+				if(null!=pageGrid.selectedItem){
+					var ptpass:ProjectTask = pageGrid.selectedItem as ProjectTask;
+					if(ptpass.pass=="0"){
+						var editPT:EditProjectTask = new EditProjectTask();
+						editPT.addEventListener(PBConstant.APP_PROJECTTASKTITLEWINDOW,addProjectTaskSuccess);
+						editPT.projectTask = ptpass;
+						PopUpManager.addPopUp(editPT,this,true);
+						Global.centerPopUpPos(editPT);
+					}else{
+						Alert.show("该任务计划已经在"+ptpass.realEndDate+"结束了,不能对其进行修改操作！","系统提示");		
+					}
+				}else{
+					Alert.show("请选择一条任务记录进行修改！","系统提示");
+				}
+			}
+			
+			//查询任务记录成功
+			public function projectTaskServiceHandle(event:ResultEvent):void{
+				pageGrid.setList(event);
+			}
+			
+			//刷新
+			public function refresh(event:AppEvent):void{
+				if(null==pbt.text||pbt.text==''){
+					projectTaskService.getProjectTaskPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
+				}else{
+					var hql:String = "from ProjectTask t where 1=1 and (project.name like '%"+pbt.text+"%' or taskName like '%"+pbt.text+"%' or taskContent like '%"+pbt.text+"%') order by pass,project,createDate desc";
+					projectTaskService.getProjectTaskBySQL(hql,1,pageGrid.pageSize);
+				}
+			}
+			
+			protected function pbt_enterHandler(event:FlexEvent):void
+			{
+				refresh(null);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:HGroup width="100%"  verticalAlign="middle">
+		<view:CustomLinkBar id="linkBar" customLinkBarEvent="linkBarClick(event)" width="100%" buttons="{linkButtons}" />
+		<views:PBTextInput id="pbt" enter="pbt_enterHandler(event)" />
+		<s:Spacer width="10" />
+	</s:HGroup>
+	<view:PageGrid id="pageGrid" header="{header}" pageRefresh="refresh(event)" width="100%" height="100%"/>
+</s:VGroup>

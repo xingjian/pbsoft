@@ -96,7 +96,6 @@
 					taskRecord.endDate = endDF.text;
 					taskRecord.pass = "0";
 					taskRecord.level = Number(level);
-					taskRecord.currentValue="0";
 					taskRecord.createUser = personNameText.text;
 					taskRecord.taskType = planTypeCB.selectedItem as DictContent;
 					taskRecordService.updateTaskRecord(taskRecord);
