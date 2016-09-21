@@ -26,4 +26,6 @@
 	<bean id="converterService" class="com.promise.cn.common.service.impl.ConverterServiceImpl" autowire="byName" />
 	<!-- 工作日志 -->
 	<bean id="workLogService" class="com.promise.cn.work.service.impl.WorkLogServiceImpl" autowire="byName" />
+	<!-- 项目管理 -->
+	<bean id="projectManagerService" class="com.promise.cn.projectmanager.service.impl.ProjectManagerServiceImpl" autowire="byName" />
 </beans>

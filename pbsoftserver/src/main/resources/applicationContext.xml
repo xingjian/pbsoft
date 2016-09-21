@@ -49,6 +49,8 @@
 				<value>com.promise.cn.filemanager.domain.FileGroup</value>
 				<value>com.promise.cn.filemanager.domain.FileDoc</value>
 				<value>com.promise.cn.work.domain.WorkLog</value>
+				<value>com.promise.cn.projectmanager.domain.ProjectTask</value>
+				<value>com.promise.cn.projectmanager.domain.ProjectTaskLog</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
