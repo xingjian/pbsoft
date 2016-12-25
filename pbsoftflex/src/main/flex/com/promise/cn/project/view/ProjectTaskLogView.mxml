@@ -11,6 +11,7 @@
 			import com.promise.cn.framework.event.AppEvent;
 			import com.promise.cn.framework.util.Global;
 			import com.promise.cn.framework.util.Icons;
+			import com.promise.cn.project.renderer.ProjectTaskLogRemarkRenderer;
 			import com.promise.cn.project.vo.ProjectTask;
 			
 			import mx.controls.Alert;
@@ -22,7 +23,7 @@
 			[Bindable]
 			public var header:Array =  [{headerText:"录入时间",dataField:"createDate",width:'120'},
 				{headerText:"当前进度",dataField:"value",width:'140',itemRenderer:new ClassFactory(PlanLogProgressBarItemRenderer)},
-				{headerText:"备注",dataField:"remark",width:'100'}];
+				{headerText:"备注",dataField:"remark",width:'100',itemRenderer:new ClassFactory(ProjectTaskLogRemarkRenderer)}];
 			
 			[Bindable]
 			private var linkButtons:Array = [{label:"删除",uri:"removeProjectTaskLog",icon:Icons.removeIcon}]

@@ -19,7 +19,7 @@
 			[Bindable]
 			public var header:Array;
 			[Bindable]
-			public var _pageSize:int = 20;
+			public var _pageSize:int = 50;
 			[Bindable]
 			public var showPageParams:Boolean=true;//是否显示分页参数
 			[Bindable]
