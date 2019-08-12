@@ -223,7 +223,13 @@
 			
 			//刷新
 			public function refresh(event:AppEvent):void{
-				taskRecordService.getTaskRecordPageSupport(null,pageGrid.pageNo,pageGrid.pageSize);
+				var valueList:Array=new Array();
+				var valueObject1:QueryObject = new QueryObject();//开始时间
+				valueObject1.key = "createUser";
+				valueObject1.value = Global.pbUser.name;
+				valueObject1.queryType = "0";
+				valueList.push(valueObject1);
+				taskRecordService.getTaskRecordPageSupport(valueList,pageGrid.pageNo,pageGrid.pageSize);
 			}
 			
 			protected function pbt_enterHandler(event:FlexEvent):void
